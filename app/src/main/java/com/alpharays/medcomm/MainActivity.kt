@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.alpharays.medcomm.ui.theme.MedCommTheme
 import com.alpharays.mymedicommfma.dummywork.MyMedicommRouter
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

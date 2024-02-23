@@ -99,8 +99,11 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.alpharays.mymedicommfma.MedicoApp
 import com.alpharays.mymedicommfma.R
+import com.alpharays.mymedicommfma.common.basesdk.BaseSDK
+import com.alpharays.mymedicommfma.common.basesdk.CustomScaffold
+import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
+import com.alpharays.mymedicommfma.community_app.MedicoUtils
 import com.alpharays.mymedicommfma.community_app.domain.model.communityscreen.allposts.CommunityPost
 import com.alpharays.mymedicommfma.community_app.presentation.navigation.CommunityAppScreens
 import com.alpharays.mymedicommfma.community_app.community_utils.CommunityConstants.COMMENT_OPTION
@@ -112,13 +115,6 @@ import com.alpharays.mymedicommfma.community_app.community_utils.CommunityConsta
 import com.alpharays.mymedicommfma.community_app.community_utils.CommunityConstants.SEND_OPTION
 import com.alpharays.mymedicommfma.community_app.community_utils.CommunityConstants.SEND_PAINTER_CONTENT_DSC
 import com.alpharays.mymedicommfma.community_app.community_utils.getCommunityViewModel
-import com.alpharays.mymedicommfma.presentation.appointment_screen.keyboardAsState
-import com.alpharays.mymedicommfma.presentation.common.CustomScaffold
-import com.alpharays.mymedicommfma.medico_utils.MedicommConstants.SOMETHING_WENT_WRONG
-import com.alpharays.mymedicommfma.medico_utils.MedicoToast
-import com.alpharays.mymedicommfma.medico_utils.MedicoUtils
-import com.alpharays.mymedicommfma.medico_utils.MedicoUtils.Companion.ComposableNoNetworkFound
-import com.alpharays.mymedicommfma.medico_utils.connectivity.ConnectivityObserver
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -128,9 +124,7 @@ fun CommunityScreen(
     isInternetAvailable: ConnectivityObserver.Status,
     postCommentsSharedViewModel: PostCommentsSharedViewModel,
 ) {
-    val communityScreenUseCase = MedicoApp
-        .getInstance()
-        .getCommunityInjector()
+    val communityScreenUseCase = BaseSDK.getCommunityInjector()
         .getCommunityUseCase()
     val communityViewModel: CommunityViewModel = getCommunityViewModel(communityScreenUseCase)
     val context = LocalContext.current
@@ -139,7 +133,7 @@ fun CommunityScreen(
         val isNetworkAlreadyLost = MedicoUtils.Companion.NetworkCheck.isNetworkAlreadyLost()
         communityViewModel.updateNetworkStatus(isInternetAvailable)
         if (isInternetAvailable == ConnectivityObserver.Status.Lost && !isNetworkAlreadyLost) {
-            MedicoToast.showToast(context, "Connection Lost")
+         //   MedicoToast.showToast(context, "Connection Lost") todo
         }
     }
 

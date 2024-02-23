@@ -76,6 +76,10 @@ dependencies {
 
     // tool tip
     implementation("com.github.skydoves:balloon-compose:1.5.2")
+
+    // Compose Lifecycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
 }
 
 afterEvaluate {

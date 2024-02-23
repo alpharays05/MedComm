@@ -80,12 +80,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DirectMessageScreen(navController: NavController) {
-    val socketIO = MedicoApp
-        .getInstance()
+    val socketIO = BaseSDK.getCommunityInjector()
         .getCommunityInjector()
         .getSocketIO()
-    val messagesScreenUseCase = MedicoApp
-        .getInstance()
+    val messagesScreenUseCase = BaseSDK.getCommunityInjector()
         .getCommunityInjector()
         .getMessagesUseCase()
     val factory = object : ViewModelProvider.Factory{

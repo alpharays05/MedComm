@@ -24,6 +24,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -51,20 +52,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.alpharays.mymedicommfma.MedicoApp
+import com.alpharays.mymedicommfma.common.basesdk.BaseSDK
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
 import com.alpharays.mymedicommfma.community_app.domain.model.communityscreen.newpost.AddNewCommunityPost
 import com.alpharays.mymedicommfma.community_app.presentation.navigation.CommunityAppScreens
 import com.alpharays.mymedicommfma.community_app.community_utils.getCommunityViewModel
-import com.alpharays.mymedicommfma.medico_utils.MedicoToast
-import com.alpharays.mymedicommfma.medico_utils.connectivity.ConnectivityObserver
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNewCommunityPostScreen(navController: NavController, isInternetAvailable: ConnectivityObserver.Status) {
-    val communityScreenUseCase = MedicoApp
-        .getInstance()
-        .getCommunityInjector()
-        .getCommunityUseCase()
+fun AddNewCommunityPostScreen(
+    navController: NavController,
+    isInternetAvailable: ConnectivityObserver.Status
+) {
+    val communityScreenUseCase = BaseSDK.getCommunityInjector().getCommunityUseCase()
     val communityViewModel: CommunityViewModel = getCommunityViewModel(communityScreenUseCase)
     var postTitle by remember { mutableStateOf("") }
     var postContent by remember { mutableStateOf("") }
@@ -73,7 +73,13 @@ fun AddNewCommunityPostScreen(navController: NavController, isInternetAvailable:
         modifier = Modifier.fillMaxSize(),
         containerColor = color,
         topBar = {
-            ComposableNewPostTopBar(navController, communityViewModel, postTitle, postContent, isInternetAvailable)
+            ComposableNewPostTopBar(
+                navController,
+                communityViewModel,
+                postTitle,
+                postContent,
+                isInternetAvailable
+            )
         },
         bottomBar = {
             ComposableNewPostBottomBar()
@@ -81,16 +87,17 @@ fun AddNewCommunityPostScreen(navController: NavController, isInternetAvailable:
     ) { paddingValues ->
         Surface(
             color = color,
-            modifier = Modifier.padding(paddingValues).fillMaxSize().padding(horizontal = 16.dp, vertical = 10.dp)
+            modifier = Modifier.padding(paddingValues).fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()){
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
-                    ComposablePostOutlinedTextField(true){
+                    ComposablePostOutlinedTextField(true) {
                         postTitle = it
                     }
                 }
                 item {
-                    ComposablePostOutlinedTextField(false){
+                    ComposablePostOutlinedTextField(false) {
                         postContent = it
                     }
                 }
@@ -100,6 +107,7 @@ fun AddNewCommunityPostScreen(navController: NavController, isInternetAvailable:
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposablePostOutlinedTextField(
     isTitle: Boolean,
@@ -107,16 +115,16 @@ fun ComposablePostOutlinedTextField(
 ) {
     val textColor0 = Color(0xFF006372)
     val textColor = Color(0xFF003D46)
-    val postHeadingLabel = if(isTitle) "Add a title" else "Add a description"
+    val postHeadingLabel = if (isTitle) "Add a title" else "Add a description"
     var postInputField by remember { mutableStateOf("") }
     val color = MaterialTheme.colorScheme.onPrimary
-    val style = if(isTitle){
+    val style = if (isTitle) {
         TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.W400,
             color = textColor
         )
-    } else{
+    } else {
         TextStyle(
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
@@ -198,19 +206,19 @@ fun ComposableNewPostTopBar(
                         interactionSource = interactionSource,
                         indication = ripple,
                     ) {
-                        if(isInternetAvailable != ConnectivityObserver.Status.Available){
-                            MedicoToast.showToast(context, "No connection")
+                        if (isInternetAvailable != ConnectivityObserver.Status.Available) {
+                        //    MedicoToast.showToast(context, "No connection") todo
                             return@clickable
                         }
                         if (postTitle.isEmpty() || postContent.isEmpty()) {
-                            MedicoToast.showToast(context, "Post title/content can not be empty")
+                      //      MedicoToast.showToast(context, "Post title/content can not be empty") todo
                             return@clickable
                         }
                         if (postContent.length < 20) {
-                            MedicoToast.showToast(
-                                context,
-                                "Post Content must greater than 20 characters"
-                            )
+//                            MedicoToast.showToast( todo
+//                                context,
+//                                "Post Content must greater than 20 characters"
+//                            )
                             return@clickable
                         }
                         val post = AddNewCommunityPost(postTitle, postContent)
@@ -229,13 +237,13 @@ fun ComposableNewPostTopBar(
         }
     }
 
-    LaunchedEffect(response){
-        with(response){
+    LaunchedEffect(response) {
+        with(response) {
             newPostResponse?.let {
-                it.success?.toInt()?.let {  isPostCreated ->
-                    if(isPostCreated == 1 && !postCreated){
+                it.success?.toInt()?.let { isPostCreated ->
+                    if (isPostCreated == 1 && !postCreated) {
                         postCreated = true
-                        MedicoToast.showToast(context, "Post created successfully")
+                  //      MedicoToast.showToast(context, "Post created successfully") todo
                         navController.navigate(CommunityAppScreens.CommunityScreen.route) {
                             popUpTo(CommunityAppScreens.AddNewCommunityPostScreen.route) {
                                 inclusive = true
@@ -285,7 +293,7 @@ fun ComposableNewPostBottomBar() {
                 val iconNameB = "Capture"
                 ComposableNewPostMediaColumn(imageVectorB, cdB, iconNameB)
 
-                if(isExpandedMoreOptions){
+                if (isExpandedMoreOptions) {
                     Icon(
                         modifier = Modifier
                             .padding(start = 10.dp, end = 5.dp)
@@ -296,8 +304,7 @@ fun ComposableNewPostBottomBar() {
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "close more options"
                     )
-                }
-                else{
+                } else {
                     Icon(
                         modifier = Modifier
                             .padding(start = 10.dp, end = 5.dp)
@@ -313,10 +320,18 @@ fun ComposableNewPostBottomBar() {
 
             AnimatedVisibility(visible = isExpandedMoreOptions) {
                 Column {
-                    Divider(modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                        .padding(top = 5.dp))
-                    ComposableNewPostExpandedOptions(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 10.dp))
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth(0.95f)
+                            .padding(top = 5.dp)
+                    )
+                    ComposableNewPostExpandedOptions(
+                        Modifier.padding(
+                            start = 12.dp,
+                            end = 12.dp,
+                            bottom = 10.dp
+                        )
+                    )
                 }
             }
         }
@@ -329,7 +344,10 @@ fun ComposableNewPostMediaColumn(imageVector: ImageVector, cd: String, text: Str
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 5.dp).clickable { MedicoToast.showToast(context, "Coming soon...") }
+        modifier = Modifier.padding(horizontal = 5.dp)
+            .clickable {
+            //    MedicoToast.showToast(context, "Coming soon...") todo
+            }
     ) {
         Icon(
             modifier = Modifier.padding(5.dp).size(20.dp),
@@ -358,7 +376,7 @@ fun ComposableNewPostExpandedOptions(modifier: Modifier) {
 
         Row(
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()

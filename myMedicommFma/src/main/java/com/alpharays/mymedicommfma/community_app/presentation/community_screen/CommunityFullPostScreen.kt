@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -53,23 +54,23 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.alpharays.mymedicommfma.MedicoApp
 import com.alpharays.mymedicommfma.R
+import com.alpharays.mymedicommfma.common.basesdk.BaseSDK
+import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
+import com.alpharays.mymedicommfma.common.nuttiessdk.MedicommConstants.KEYBOARD_CLOSE_ON_BACK_PRESS_KEY_CODE
 import com.alpharays.mymedicommfma.community_app.domain.model.communityscreen.allposts.CommunityPost
 import com.alpharays.mymedicommfma.community_app.domain.model.communityscreen.comments.allcomments.AllCommentsData
 import com.alpharays.mymedicommfma.community_app.community_utils.getCommunityViewModel
-import com.alpharays.mymedicommfma.presentation.theme.size
-import com.alpharays.mymedicommfma.medico_utils.MedicommConstants.KEYBOARD_CLOSE_ON_BACK_PRESS_KEY_CODE
-import com.alpharays.mymedicommfma.medico_utils.connectivity.ConnectivityObserver
+import com.alpharays.mymedicommfma.community_app.presentation.theme.size
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityFullPostScreen(
     navController: NavController,
     isInternetAvailable: ConnectivityObserver.Status,
     postCommentsSharedViewModel: PostCommentsSharedViewModel,
 ) {
-    val communityUseCase = MedicoApp
-        .getInstance()
+    val communityUseCase = BaseSDK
         .getCommunityInjector()
         .getCommunityUseCase()
     val currPostCommentsViewModel: CurrPostCommentsViewModel = getCommunityViewModel(communityUseCase)
@@ -188,7 +189,7 @@ fun CommentsTopBarComposable() {
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsBottomBarComposable(
     onBottomBarStatusChanged: (Boolean) -> Unit,

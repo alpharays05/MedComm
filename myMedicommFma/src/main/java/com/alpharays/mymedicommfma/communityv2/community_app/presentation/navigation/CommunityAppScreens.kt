@@ -8,9 +8,9 @@ import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.Com
 
 
 sealed class CommunityAppScreens(val route: String) {
-     object CommunityScreen : CommunityAppScreens(COMMUNITY_SCREEN_ROUTE)
-     object AddNewCommunityPostScreen : CommunityAppScreens(ADD_NEW_POST_SCREEN_ROUTE)
-     object CommunityPostScreen : CommunityAppScreens(COMMENTS_SCREEN_ROUTE)
-     object DirectMessageScreen : CommunityAppScreens(DIRECT_MESSAGE_SCREEN_ROUTE)
-     object MessageInboxScreen : CommunityAppScreens(MESSAGE_INBOX_SCREEN_ROUTE)
+     data object CommunityScreen : CommunityAppScreens(COMMUNITY_SCREEN_ROUTE)
+     data object AddNewCommunityPostScreen : CommunityAppScreens(ADD_NEW_POST_SCREEN_ROUTE)
+     data object CommunityPostScreen : CommunityAppScreens(COMMENTS_SCREEN_ROUTE)
+     data object DirectMessageScreen : CommunityAppScreens(DIRECT_MESSAGE_SCREEN_ROUTE)
+     data object MessageInboxScreen : CommunityAppScreens(MESSAGE_INBOX_SCREEN_ROUTE)
 }

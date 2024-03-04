@@ -102,7 +102,7 @@ afterEvaluate {
 
                 groupId = "com.alpharays.mymedicommfma"
                 artifactId = "mymedicommfma"
-                version = "0.0.1-alpha"
+                version = "0.0.6-release"
             }
         }
     }

@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("maven-publish")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -84,6 +85,8 @@ dependencies {
 
     //alaskaGemSdk
     implementation("com.github.alpharays05:alaskasdk:0.0.2-release")
+
+    implementation("com.airbnb.android:lottie-compose:6.2.0")
 }
 
 afterEvaluate {

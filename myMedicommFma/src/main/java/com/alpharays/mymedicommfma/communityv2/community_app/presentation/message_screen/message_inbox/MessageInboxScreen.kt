@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.alpharays.medico.R
-import com.alpharays.medico.medico_utils.MedicoUtils
+import com.alpharays.medico.medico_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allinboxmessages.ChatMsg
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
 import java.util.Calendar
@@ -296,7 +296,7 @@ fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
         ) {
             val context = LocalContext.current
             val painter = painterResource(id = R.drawable.doctor_profile)
-            val color = MedicoUtils.getMedicoColor(context, R.color.bluish_gray)
+            val color = CommunityUtils.getMedicoColor(context, R.color.bluish_gray)
             Image(
                 modifier = Modifier
                     .padding(top = 8.dp)

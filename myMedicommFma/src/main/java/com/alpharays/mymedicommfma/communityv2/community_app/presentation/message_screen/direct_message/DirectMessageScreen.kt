@@ -74,18 +74,19 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.alpharays.medico.MedicoApp
 import com.alpharays.medico.R
-import com.alpharays.medico.medico_utils.MedicoUtils
+import com.alpharays.medico.medico_utils.CommunityUtils
+import com.alpharays.mymedicommfma.R
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter
+import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.DirectMessage
 import kotlinx.coroutines.launch
 
 @Composable
 fun DirectMessageScreen(navController: NavController) {
-    val socketIO = MedicoApp
-        .getInstance()
+    val socketIO = MedCommRouter
         .getCommunityInjector()
         .getSocketIO()
-    val messagesScreenUseCase = MedicoApp
-        .getInstance()
+    val messagesScreenUseCase = MedCommRouter
         .getCommunityInjector()
         .getMessagesUseCase()
     val factory = object : ViewModelProvider.Factory{
@@ -143,7 +144,7 @@ fun ComposableUserTopBar(navController: NavController) {
 
         val painter = painterResource(id = R.drawable.doctor_profile)
         val context = LocalContext.current
-        val color = MedicoUtils.getMedicoColor(context, R.color.bluish_gray)
+        val color = CommunityUtils.getMedicoColor(context, R.color.bluish_gray)
         Image(
             modifier = Modifier
                 .padding(start = 5.dp)
@@ -443,7 +444,7 @@ fun ComposableUserBottomBar(navController: NavController, directMessageViewModel
 @Composable
 fun ComposableAttachmentItems() {
     val context = LocalContext.current
-    val color = MedicoUtils.getMedicoColor(context, R.color.bluish_gray)
+    val color = CommunityUtils.getMedicoColor(context, R.color.bluish_gray)
     Surface(
         modifier = Modifier
             .wrapContentSize()
@@ -486,7 +487,7 @@ fun ComposableLottieComposition(
         modifier.padding(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(attachmentId))
+        val composition by rememberLottieComposition(LottiegrCompositionSpec.RawRes(attachmentId))
         LottieAnimation(
             modifier = Modifier.size(120.dp),
             composition = composition,

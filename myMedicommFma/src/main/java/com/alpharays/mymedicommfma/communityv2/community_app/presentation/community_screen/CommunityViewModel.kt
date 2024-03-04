@@ -3,10 +3,10 @@ package com.alpharays.mymedicommfma.communityv2.community_app.presentation.commu
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alpharays.medico.medico_utils.MedicoConstants.UNEXPECTED_ERROR
-import com.alpharays.medico.medico_utils.MedicoUtils
-import com.alpharays.medico.medico_utils.ResponseResult
+import com.alpharays.alaskagemsdk.network.ResponseResult
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.UNEXPECTED_ERROR
+import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.AllCommunityPostsParent
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.newpost.AddNewCommunityPost
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.newpost.NewPostResponse
@@ -34,17 +34,17 @@ class CommunityViewModel(
     val networkStatus: StateFlow<ConnectivityObserver.Status> = _networkStatus
 
     init {
-        token = MedicoUtils.getAuthToken()
+        token = CommunityUtils.getAuthToken()
     }
 
     fun updateNetworkStatus(status: ConnectivityObserver.Status) {
         _networkStatus.value = status
         if(status == ConnectivityObserver.Status.Available){
-            MedicoUtils.Companion.NetworkCheck.setNetworkStatus(false)
+            CommunityUtils.Companion.NetworkCheck.setNetworkStatus(false)
             getAllCommunityPosts()
         }
         if(status == ConnectivityObserver.Status.Lost){
-            MedicoUtils.Companion.NetworkCheck.setNetworkStatus(true)
+            CommunityUtils.Companion.NetworkCheck.setNetworkStatus(true)
         }
     }
 

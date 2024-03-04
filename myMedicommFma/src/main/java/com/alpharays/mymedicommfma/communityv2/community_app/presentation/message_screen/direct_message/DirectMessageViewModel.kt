@@ -3,7 +3,7 @@ package com.alpharays.mymedicommfma.communityv2.community_app.presentation.messa
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alpharays.medico.medico_utils.MedicoUtils
+import com.alpharays.medico.medico_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.SocketIO
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.AllChats
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.DirectMessage
@@ -19,7 +19,7 @@ class DirectMessageViewModel(
     init {
         connectToJoinRoomSocket()
         connectToMessagesSocket()
-        token = MedicoUtils.getAuthToken()
+        token = CommunityUtils.getAuthToken()
 //        val chatId = savedStateHandle.get<String>("chatId") ?: ""
 
 //        if (token.isNotEmpty() && chatId.isNotEmpty()) {

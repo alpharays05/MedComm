@@ -2,7 +2,6 @@ package com.alpharays.medcomm
 
 import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -16,7 +15,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import com.alpharays.medcomm.ui.theme.MedCommTheme
-import com.alpharays.mymedicommfma.dummywork.MyMedicommRouter
 
 
 class MainActivity : ComponentActivity() {

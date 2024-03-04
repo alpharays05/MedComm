@@ -1,7 +1,6 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.data.source.remote
 
-import com.alpharays.medico.medico_utils.MedicoConstants
-import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.ADD_COMMENT
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.ADD_NEW_CHAT
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.ADD_NEW_POST
@@ -42,42 +41,42 @@ interface CommunityApiServices {
     // all docs posts
     @GET(ALL_COMMUNITY_POSTS)
     suspend fun getAllCommunityPosts(
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
     ): Response<AllCommunityPostsParent>
 
     // all new post
     @POST(ADD_NEW_POST)
     suspend fun addMyNewPost(
         @Body addNewCommunityPost: AddNewCommunityPost,
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
     ): Response<NewPostResponse>
 
     // all comments
     @PUT(GET_ALL_COMMENTS)
     suspend fun getAllComments(
         @Body postIdBody: AllCommentsRequestBody,
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
     ): Response<AllCommentsResponse>
 
     // all replies on a comment
     @GET(GET_ALL_REPLIES_ON_COMMENT)
     suspend fun getAllReplies(
         @Body commentId: GetAllRepliesData,
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
     ): Response<AllRepliesResponse>
 
     // add new comment
     @POST(ADD_COMMENT)
     suspend fun addNewComment(
         @Body addCommentData: AddCommentData,
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
     ): Response<AddCommentResponse>
 
     // reply on a comment
     @PUT(UPDATE_COMMENT)
     suspend fun updateComment(
         @Body reply: UpdateCommentData,
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
     ): Response<UpdatedCommentResponse>
 
 
@@ -88,20 +87,20 @@ interface CommunityApiServices {
     // add new chat
     @POST(ADD_NEW_CHAT)
     suspend fun startNewChat(
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
         @Body newChat: NewChat,
     ): Response<AddNewChatModel>
 
     // get all inbox messages
     @GET(GET_INBOX_MESSAGES)
     suspend fun getAllInboxMessagesList(
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
     ): Response<InboxMsgModel>
 
     // get all chats
     @GET(GET_ALL_CHATS)
     suspend fun getAllMessagesList(
-        @Header(MedicoConstants.TOKEN_KEYWORD) token: String,
+        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
         @Body allChats: AllChats,
     ): Response<AllCurrMessages>
 }

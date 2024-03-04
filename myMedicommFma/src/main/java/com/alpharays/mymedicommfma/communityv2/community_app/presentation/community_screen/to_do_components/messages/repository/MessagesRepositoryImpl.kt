@@ -1,14 +1,14 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.repository
 
+import com.alpharays.alaskagemsdk.AlaskaGemSdkConstants.SOMETHING_WENT_WRONG
+import com.alpharays.alaskagemsdk.network.ResponseHandler
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.remote.CommunityApiServices
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.AllChats
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.NewChat
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.addnewchat.AddNewChatModel
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allcurmessages.AllCurrMessages
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allinboxmessages.InboxMsgModel
-import com.alpharays.medico.medico_utils.MedicoConstants.SOMETHING_WENT_WRONG
-import com.alpharays.medico.medico_utils.ResponseHandler
-import com.alpharays.medico.medico_utils.ResponseResult
+import com.alpharays.alaskagemsdk.network.ResponseResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

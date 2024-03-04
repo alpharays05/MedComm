@@ -1,11 +1,10 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.data.di
 
 import android.content.Context
-import com.alpharays.medico.data.source.remote.ApiServices
-import com.alpharays.medico.medico_utils.MedicoConstants.API_SAFE_KEY
-import com.alpharays.medico.medico_utils.MedicoConstants.API_SAFE_KEY_VALUE
-import com.alpharays.medico.medico_utils.MedicoConstants.BASE_URL
-import com.alpharays.medico.medico_utils.ResponseHandler
+import com.alpharays.alaskagemsdk.network.ResponseHandler
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.API_SAFE_KEY
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.API_SAFE_KEY_VALUE
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.BASE_URL
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.remote.CommunityApiServices
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.CommunityRepositoryImpl
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.SocketIOImpl
@@ -27,7 +26,7 @@ class MedicoCommunityInjector {
      * Base url & api services declaration
      */
     private val baseUrl = BASE_URL
-    private lateinit var apiServices: ApiServices
+  //  private lateinit var apiServices: ApiServices
     private lateinit var communityApiServices: CommunityApiServices
     private lateinit var context: Context
 

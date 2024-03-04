@@ -1,7 +1,7 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.domain.usecase
 
-import com.alpharays.medico.medico_utils.MedicoConstants.SOMETHING_WENT_WRONG
-import com.alpharays.medico.medico_utils.ResponseResult
+import com.alpharays.alaskagemsdk.AlaskaGemSdkConstants.SOMETHING_WENT_WRONG
+import com.alpharays.alaskagemsdk.network.ResponseResult
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.AllCommunityPostsParent
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.allcomments.AllCommentsRequestBody
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.allcomments.AllCommentsResponse

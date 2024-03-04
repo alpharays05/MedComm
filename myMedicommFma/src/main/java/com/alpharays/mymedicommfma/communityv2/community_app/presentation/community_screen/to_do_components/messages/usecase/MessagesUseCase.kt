@@ -1,7 +1,7 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.usecase
 
-import com.alpharays.medico.medico_utils.MedicoConstants.SOMETHING_WENT_WRONG
-import com.alpharays.medico.medico_utils.ResponseResult
+import com.alpharays.alaskagemsdk.AlaskaGemSdkConstants.SOMETHING_WENT_WRONG
+import com.alpharays.alaskagemsdk.network.ResponseResult
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.AllChats
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.NewChat
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.addnewchat.AddNewChatModel

@@ -53,6 +53,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
@@ -99,15 +100,11 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.alpharays.medico.MedicoApp
-import com.alpharays.medico.R
-import com.alpharays.medico.presentation.appointment_screen.keyboardAsState
-import com.alpharays.medico.presentation.common.CustomScaffold
-import com.alpharays.medico.medico_utils.MedicoConstants.SOMETHING_WENT_WRONG
-import com.alpharays.medico.medico_utils.MedicoToast
-import com.alpharays.medico.medico_utils.MedicoUtils
-import com.alpharays.medico.medico_utils.MedicoUtils.Companion.ComposableNoNetworkFound
+import com.alpharays.alaskagemsdk.AlaskaGemSdkConstants.SOMETHING_WENT_WRONG
+import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter
+import com.alpharays.mymedicommfma.communityv2.MedCommToast
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.COMMENT_OPTION
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.COMMENT_PAINTER_CONTENT_DSC
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.LIKE_OPTION
@@ -116,6 +113,8 @@ import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.Com
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.REPOST_PAINTER_CONTENT_DSC
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.SEND_OPTION
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.SEND_PAINTER_CONTENT_DSC
+import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
+import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils.Companion.ComposableNoNetworkFound
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.getCommunityViewModel
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.CommunityPost
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
@@ -129,25 +128,24 @@ fun CommunityScreen(
     postCommentsSharedViewModel: PostCommentsSharedViewModel?,
     modifier: Modifier,
 ) {
-    val communityScreenUseCase = MedicoApp
-        .getInstance()
+    val communityScreenUseCase = MedCommRouter
         .getCommunityInjector()
         .getCommunityUseCase()
     val communityViewModel: CommunityViewModel = getCommunityViewModel(communityScreenUseCase)
     val context = LocalContext.current
 
     LaunchedEffect(isInternetAvailable) {
-        val isNetworkAlreadyLost = MedicoUtils.Companion.NetworkCheck.isNetworkAlreadyLost()
+        val isNetworkAlreadyLost = false //todo
         communityViewModel.updateNetworkStatus(isInternetAvailable)
         if (isInternetAvailable == ConnectivityObserver.Status.Lost && !isNetworkAlreadyLost) {
-            MedicoToast.showToast(context, "Connection Lost")
+            MedCommToast.showToast(context, "Connection Lost")
         }
     }
 
     var showBottomBar by remember { mutableStateOf(true) }
 
     Surface(modifier = modifier.fillMaxSize()) {
-        CustomScaffold(navController = navController, isBottomBarPresent = showBottomBar) { innerPadding ->
+       Scaffold { innerPadding ->
             ComposableCommunityScreen(
                 context,
                 navController,
@@ -323,7 +321,7 @@ fun ComposableCommunitySearch(
                 .size(60.dp)
                 .padding(10.dp, 25.dp, 10.dp, 10.dp)
                 .clickable {
-                    MedicoToast.showToast(context, "Going to inbox...")
+                    MedCommToast.showToast(context, "Going to inbox...")
                     navController.navigate(CommunityAppScreens.MessageInboxScreen.route) {
                         launchSingleTop = true
                     }
@@ -363,13 +361,13 @@ fun ComposableCommunityPosts(
     LaunchedEffect(allCommunityPostsResponse) {
         with(allCommunityPostsResponse) {
             if (isLoading != null && isLoading == true) {
-                MedicoToast.showToast(context, "Loading posts")
+                MedCommToast.showToast(context, "Loading posts")
                 return@LaunchedEffect
             }
 
             if (!error.isNullOrEmpty()) {
                 errorFound = true
-                MedicoToast.showToast(context, SOMETHING_WENT_WRONG)
+                MedCommToast.showToast(context, SOMETHING_WENT_WRONG)
                 return@LaunchedEffect
             }
 
@@ -452,7 +450,7 @@ fun ComposableCommunityPosts(
                     .clip(RoundedCornerShape(12.dp))
                     .border(0.5.dp, Color.Black, RoundedCornerShape(12.dp))
                     .clickable {
-                        MedicoToast.showToast(context, "Adding new post")
+                        MedCommToast.showToast(context, "Adding new post")
                         navController.navigate(CommunityAppScreens.AddNewCommunityPostScreen.route) {
                             launchSingleTop = true
                         }
@@ -508,7 +506,7 @@ fun ComposableCommunityPostUpperRow(context: Context, post: CommunityPost) {
         Row(
             verticalAlignment = Alignment.Top,
             modifier = Modifier.clickable {
-                MedicoToast.showToast(context, "Connecting")
+                MedCommToast.showToast(context, "Connecting")
             }
         ) {
             Icon(
@@ -533,7 +531,7 @@ fun ComposableCommunityPostContent(
     navController: NavController? = null,
 ) {
     val currentPostId = post.id
-    val color = MedicoUtils.getMedicoColor(context, R.color.bluish_gray)
+    val color = CommunityUtils.getMedicoColor(context, R.color.bluish_gray)
 
     val interactionSource by remember {
         mutableStateOf(MutableInteractionSource())
@@ -712,8 +710,6 @@ fun ComposableExpandedComment(focusRequester: FocusRequester, onDismiss: () -> U
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
-    // Custom back handler logic
-    val isKeyboardOpen by keyboardAsState()
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()

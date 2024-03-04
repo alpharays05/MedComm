@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 
-import com.alpharays.medico.medico_utils.MedicoUtils
+import com.alpharays.medico.medico_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.AddNewCommunityPostScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.CommunityFullPostScreen
@@ -23,7 +23,7 @@ fun Navigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
     val postCommentsSharedViewModel: PostCommentsSharedViewModel = viewModel()
-    val isInternetAvailable = MedicoUtils.isInternetAvailable(context)
+    val isInternetAvailable = CommunityUtils.isInternetAvailable(context)
 
     val startDestination = CommunityAppScreens.CommunityScreen.route
     NavHost(navController = navController, startDestination = startDestination) {

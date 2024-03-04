@@ -53,14 +53,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.alpharays.medico.MedicoApp
-import com.alpharays.medico.R
-import com.alpharays.medico.presentation.theme.size
-import com.alpharays.medico.medico_utils.MedicoConstants.KEYBOARD_CLOSE_ON_BACK_PRESS_KEY_CODE
+import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.KEYBOARD_CLOSE_ON_BACK_PRESS_KEY_CODE
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.getCommunityViewModel
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.CommunityPost
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.allcomments.AllCommentsData
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.size
 
 @Composable
 fun CommunityFullPostScreen(
@@ -68,8 +68,7 @@ fun CommunityFullPostScreen(
     isInternetAvailable: ConnectivityObserver.Status,
     postCommentsSharedViewModel: PostCommentsSharedViewModel,
 ) {
-    val communityUseCase = MedicoApp
-        .getInstance()
+    val communityUseCase = MedCommRouter
         .getCommunityInjector()
         .getCommunityUseCase()
     val currPostCommentsViewModel: CurrPostCommentsViewModel = getCommunityViewModel(communityUseCase)

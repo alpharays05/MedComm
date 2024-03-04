@@ -1,6 +1,6 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.domain.repository
 
-import com.alpharays.medico.medico_utils.ResponseResult
+import com.alpharays.alaskagemsdk.network.ResponseResult
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.AllCommunityPostsParent
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.addcomment.AddCommentData
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.addcomment.AddCommentResponse

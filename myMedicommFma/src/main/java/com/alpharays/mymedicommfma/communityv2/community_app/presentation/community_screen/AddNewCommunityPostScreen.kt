@@ -51,17 +51,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.alpharays.medico.MedicoApp
-import com.alpharays.medico.medico_utils.MedicoToast
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter
+import com.alpharays.mymedicommfma.communityv2.MedCommToast
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.getCommunityViewModel
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.newpost.AddNewCommunityPost
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
 
 @Composable
-fun AddNewCommunityPostScreen(navController: NavController, isInternetAvailable: ConnectivityObserver.Status) {
-    val communityScreenUseCase = MedicoApp
-        .getInstance()
+fun AddNewCommunityPostScreen(
+    navController: NavController,
+    isInternetAvailable: ConnectivityObserver.Status
+) {
+    val communityScreenUseCase = MedCommRouter
         .getCommunityInjector()
         .getCommunityUseCase()
     val communityViewModel: CommunityViewModel = getCommunityViewModel(communityScreenUseCase)
@@ -72,7 +74,13 @@ fun AddNewCommunityPostScreen(navController: NavController, isInternetAvailable:
         modifier = Modifier.fillMaxSize(),
         containerColor = color,
         topBar = {
-            ComposableNewPostTopBar(navController, communityViewModel, postTitle, postContent, isInternetAvailable)
+            ComposableNewPostTopBar(
+                navController,
+                communityViewModel,
+                postTitle,
+                postContent,
+                isInternetAvailable
+            )
         },
         bottomBar = {
             ComposableNewPostBottomBar()
@@ -80,16 +88,17 @@ fun AddNewCommunityPostScreen(navController: NavController, isInternetAvailable:
     ) { paddingValues ->
         Surface(
             color = color,
-            modifier = Modifier.padding(paddingValues).fillMaxSize().padding(horizontal = 16.dp, vertical = 10.dp)
+            modifier = Modifier.padding(paddingValues).fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()){
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
-                    ComposablePostOutlinedTextField(true){
+                    ComposablePostOutlinedTextField(true) {
                         postTitle = it
                     }
                 }
                 item {
-                    ComposablePostOutlinedTextField(false){
+                    ComposablePostOutlinedTextField(false) {
                         postContent = it
                     }
                 }
@@ -106,16 +115,16 @@ fun ComposablePostOutlinedTextField(
 ) {
     val textColor0 = Color(0xFF006372)
     val textColor = Color(0xFF003D46)
-    val postHeadingLabel = if(isTitle) "Add a title" else "Add a description"
+    val postHeadingLabel = if (isTitle) "Add a title" else "Add a description"
     var postInputField by remember { mutableStateOf("") }
     val color = MaterialTheme.colorScheme.onPrimary
-    val style = if(isTitle){
+    val style = if (isTitle) {
         TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.W400,
             color = textColor
         )
-    } else{
+    } else {
         TextStyle(
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
@@ -197,16 +206,16 @@ fun ComposableNewPostTopBar(
                         interactionSource = interactionSource,
                         indication = ripple,
                     ) {
-                        if(isInternetAvailable != ConnectivityObserver.Status.Available){
-                            MedicoToast.showToast(context, "No connection")
+                        if (isInternetAvailable != ConnectivityObserver.Status.Available) {
+                            MedCommToast.showToast(context, "No connection")
                             return@clickable
                         }
                         if (postTitle.isEmpty() || postContent.isEmpty()) {
-                            MedicoToast.showToast(context, "Post title/content can not be empty")
+                            MedCommToast.showToast(context, "Post title/content can not be empty")
                             return@clickable
                         }
                         if (postContent.length < 20) {
-                            MedicoToast.showToast(
+                            MedCommToast.showToast(
                                 context,
                                 "Post Content must greater than 20 characters"
                             )
@@ -228,13 +237,13 @@ fun ComposableNewPostTopBar(
         }
     }
 
-    LaunchedEffect(response){
-        with(response){
+    LaunchedEffect(response) {
+        with(response) {
             newPostResponse?.let {
-                it.success?.toInt()?.let {  isPostCreated ->
-                    if(isPostCreated == 1 && !postCreated){
+                it.success?.toInt()?.let { isPostCreated ->
+                    if (isPostCreated == 1 && !postCreated) {
                         postCreated = true
-                        MedicoToast.showToast(context, "Post created successfully")
+                        MedCommToast.showToast(context, "Post created successfully")
                         navController.navigate(CommunityAppScreens.CommunityScreen.route) {
                             popUpTo(CommunityAppScreens.AddNewCommunityPostScreen.route) {
                                 inclusive = true
@@ -284,7 +293,7 @@ fun ComposableNewPostBottomBar() {
                 val iconNameB = "Capture"
                 ComposableNewPostMediaColumn(imageVectorB, cdB, iconNameB)
 
-                if(isExpandedMoreOptions){
+                if (isExpandedMoreOptions) {
                     Icon(
                         modifier = Modifier
                             .padding(start = 10.dp, end = 5.dp)
@@ -295,8 +304,7 @@ fun ComposableNewPostBottomBar() {
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "close more options"
                     )
-                }
-                else{
+                } else {
                     Icon(
                         modifier = Modifier
                             .padding(start = 10.dp, end = 5.dp)
@@ -312,10 +320,18 @@ fun ComposableNewPostBottomBar() {
 
             AnimatedVisibility(visible = isExpandedMoreOptions) {
                 Column {
-                    Divider(modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                        .padding(top = 5.dp))
-                    ComposableNewPostExpandedOptions(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 10.dp))
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth(0.95f)
+                            .padding(top = 5.dp)
+                    )
+                    ComposableNewPostExpandedOptions(
+                        Modifier.padding(
+                            start = 12.dp,
+                            end = 12.dp,
+                            bottom = 10.dp
+                        )
+                    )
                 }
             }
         }
@@ -328,7 +344,8 @@ fun ComposableNewPostMediaColumn(imageVector: ImageVector, cd: String, text: Str
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 5.dp).clickable { MedicoToast.showToast(context, "Coming soon...") }
+        modifier = Modifier.padding(horizontal = 5.dp)
+            .clickable { MedCommToast.showToast(context, "Coming soon...") }
     ) {
         Icon(
             modifier = Modifier.padding(5.dp).size(20.dp),
@@ -357,7 +374,7 @@ fun ComposableNewPostExpandedOptions(modifier: Modifier) {
 
         Row(
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()

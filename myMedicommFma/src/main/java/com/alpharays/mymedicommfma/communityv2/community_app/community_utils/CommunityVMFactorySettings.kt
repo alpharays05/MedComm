@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.savedstate.SavedStateRegistryOwner
-import com.alpharays.medico.medico_utils.SavedStateHandleViewModelFactory
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.usecase.CommunityUseCase
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.CommunityViewModel
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.CurrPostCommentsViewModel

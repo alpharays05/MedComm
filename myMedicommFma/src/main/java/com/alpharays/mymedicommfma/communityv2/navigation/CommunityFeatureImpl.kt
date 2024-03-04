@@ -18,7 +18,7 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.messag
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.message_screen.message_inbox.MessageInboxScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
 
-private const val baseRoute = "community"
+private const val baseRoute = "community_screen"
 private const val commRouteScenario = "$baseRoute/scenario"
 
 class CommunityFeatureImpl(

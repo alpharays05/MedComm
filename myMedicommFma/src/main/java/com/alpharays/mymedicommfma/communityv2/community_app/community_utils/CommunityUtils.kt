@@ -33,13 +33,6 @@ import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.NO_CONNECTION
 import com.alpharays.mymedicommfma.communityv2.MedCommToast
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.CommunityViewModel
-import com.skydoves.balloon.ArrowOrientation
-import com.skydoves.balloon.ArrowPositionRules
-import com.skydoves.balloon.Balloon
-import com.skydoves.balloon.BalloonAnimation
-import com.skydoves.balloon.BalloonHighlightAnimation
-import com.skydoves.balloon.BalloonSizeSpec
-import com.skydoves.balloon.compose.rememberBalloonBuilder
 
 class CommunityUtils {
     companion object {

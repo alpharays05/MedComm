@@ -48,6 +48,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 }
 
 fun openMediCommFma(context: Context) {
+    MedCommRouter.initiateMedCommRouter(context)
     MedCommRouter.startDummyActivity(context)
 }
 

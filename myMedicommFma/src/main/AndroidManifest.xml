@@ -2,9 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <application>
         <activity
             android:name=".dummywork.DummyActivity"
+            android:theme="@style/Theme.AppCompat.Light"
+            android:exported="false" />
+        <activity
+            android:name=".communityv2.community_app.CommunityActivity"
             android:theme="@style/Theme.AppCompat.Light"
             android:exported="false" />
     </application>

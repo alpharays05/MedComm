@@ -2,6 +2,7 @@ package com.alpharays.mymedicommfma.communityv2
 
 import android.content.Context
 import android.content.Intent
+import com.alpharays.mymedicommfma.communityv2.community_app.CommunityActivity
 import com.alpharays.mymedicommfma.communityv2.community_app.data.di.MedicoCommunityInjector
 import com.alpharays.mymedicommfma.dummywork.DummyActivity
 
@@ -80,7 +81,7 @@ object MedCommRouter {
 
     fun startDummyActivity(context: Context) {
         // Start the DummyActivity
-        val intent = Intent(context, DummyActivity::class.java)
+        val intent = Intent(context, CommunityActivity::class.java)
         context.startActivity(intent)
     }
 

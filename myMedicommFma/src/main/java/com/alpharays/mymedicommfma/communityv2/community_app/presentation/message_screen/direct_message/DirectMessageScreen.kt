@@ -487,7 +487,7 @@ fun ComposableLottieComposition(
         modifier.padding(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val composition by rememberLottieComposition(LottiegrCompositionSpec.RawRes(attachmentId))
+        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(attachmentId))
         LottieAnimation(
             modifier = Modifier.size(120.dp),
             composition = composition,

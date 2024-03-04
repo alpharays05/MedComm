@@ -47,6 +47,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.alpharays.medico.R
 import com.alpharays.medico.medico_utils.CommunityUtils
+import com.alpharays.mymedicommfma.R
+import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allinboxmessages.ChatMsg
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
 import java.util.Calendar

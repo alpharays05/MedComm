@@ -1,9 +1,9 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl
 
 import android.util.Log
-import com.alpharays.mymedicommfma.communityv2.MedCommConstant.APP_TAG
-import com.alpharays.mymedicommfma.communityv2.MedCommConstant.APP_TAG_ERROR
-import com.alpharays.mymedicommfma.communityv2.MedCommConstant.BASE_URL
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.APP_TAG
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.APP_TAG_ERROR
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.BASE_URL
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.JOIN_ROOM
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.MESSAGES_ROOM
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.MESSAGE_REPLY_EVENT

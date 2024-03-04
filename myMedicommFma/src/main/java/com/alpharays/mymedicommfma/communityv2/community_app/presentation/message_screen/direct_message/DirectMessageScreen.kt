@@ -72,9 +72,6 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.alpharays.medico.MedicoApp
-import com.alpharays.medico.R
-import com.alpharays.medico.medico_utils.CommunityUtils
 import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils

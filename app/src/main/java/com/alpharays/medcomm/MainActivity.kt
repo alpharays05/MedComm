@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import com.alpharays.medcomm.ui.theme.MedCommTheme
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 
 
 class MainActivity : ComponentActivity() {
@@ -47,7 +48,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 }
 
 fun openMediCommFma(context: Context) {
-    MyMedicommRouter.startDummyActivity(context)
+    MedCommRouter.startDummyActivity(context)
 }
 
 

@@ -125,13 +125,13 @@ import kotlinx.coroutines.launch
 fun CommunityScreen(
     navController: NavController,
     isInternetAvailable: ConnectivityObserver.Status,
-    postCommentsSharedViewModel: PostCommentsSharedViewModel?,
     modifier: Modifier,
 ) {
     val communityScreenUseCase = MedCommRouter
         .getCommunityInjector()
         .getCommunityUseCase()
     val communityViewModel: CommunityViewModel = getCommunityViewModel(communityScreenUseCase)
+    val postCommentsSharedViewModel: PostCommentsSharedViewModel =  getCommunityViewModel(null)
     val context = LocalContext.current
 
     LaunchedEffect(isInternetAvailable) {

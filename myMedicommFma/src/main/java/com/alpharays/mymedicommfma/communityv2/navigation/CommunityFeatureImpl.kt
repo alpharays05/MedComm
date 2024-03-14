@@ -38,7 +38,6 @@ class CommunityFeatureImpl(
             CommunityScreen(
                 navController,
                 isInternetAvailable,
-                postCommentsSharedViewModel,
                 modifier
             )
         }

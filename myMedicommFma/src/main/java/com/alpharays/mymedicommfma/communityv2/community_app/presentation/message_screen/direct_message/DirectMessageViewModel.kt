@@ -1,5 +1,6 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.presentation.message_screen.direct_message
 
+import android.content.Context
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,9 +9,13 @@ import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.S
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.AllChats
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.DirectMessage
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.usecase.MessagesUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DirectMessageViewModel(
+@HiltViewModel
+class DirectMessageViewModel @Inject constructor(
+    context: Context,
     private val socketIO: SocketIO,
     private val useCase: MessagesUseCase,
 ) : ViewModel() {
@@ -19,14 +24,7 @@ class DirectMessageViewModel(
     init {
         connectToJoinRoomSocket()
         connectToMessagesSocket()
-        token = CommunityUtils.getAuthToken()
-//        val chatId = savedStateHandle.get<String>("chatId") ?: ""
-
-//        if (token.isNotEmpty() && chatId.isNotEmpty()) {
-//            viewModelScope.launch {
-//                getAllMessages(token, chatId)
-//            }
-//        }
+        token = CommunityUtils.getAuthToken(context)
     }
 
     private fun getAllMessages(chatId: String) {

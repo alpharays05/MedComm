@@ -19,8 +19,9 @@ import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.commun
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.CommunityRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class CommunityRepositoryImpl(
+class CommunityRepositoryImpl @Inject constructor(
     private val apiServices: CommunityApiServices,
     private val responseHandler: ResponseHandler,
 ) : CommunityRepository {

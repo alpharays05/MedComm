@@ -3,7 +3,7 @@ package com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_i
 import android.util.Log
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.APP_TAG
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.APP_TAG_ERROR
-import com.alpharays.mymedicommfma.communityv2.MedCommRouter.BASE_URL
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.SOCKET_BASE_URL
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.JOIN_ROOM
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.MESSAGES_ROOM
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.MESSAGE_REPLY_EVENT
@@ -49,7 +49,7 @@ class SocketIOImpl : SocketIO {
     override val messagesSocketState: StateFlow<MessagesSocketState> = _messagesSocketState.asStateFlow()
 
     private fun createSocket(): Socket? {
-        val url = BASE_URL
+        val url = SOCKET_BASE_URL
         return try {
             val options = IO.Options()
             options.transports = arrayOf(WebSocket.NAME)
@@ -167,7 +167,6 @@ class SocketIOImpl : SocketIO {
         messageRoomSocket?.off(MESSAGES_ROOM)
         messageRoomSocket?.disconnect()
     }
-
 
     override fun connectMessagesSocket() {
         val scope = CoroutineScope(Dispatchers.IO)

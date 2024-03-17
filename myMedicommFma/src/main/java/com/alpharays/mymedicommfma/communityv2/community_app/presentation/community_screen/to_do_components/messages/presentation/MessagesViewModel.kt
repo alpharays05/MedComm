@@ -10,9 +10,14 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.commun
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allcurmessages.AllCurrMessages
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allinboxmessages.InboxMsgModel
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.usecase.MessagesUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MessagesViewModel(private val messagesUseCase: MessagesUseCase) : ViewModel() {
+@HiltViewModel
+class MessagesViewModel @Inject constructor(
+    private val messagesUseCase: MessagesUseCase,
+) : ViewModel() {
     private val _allInboxMessagesLiveData = MutableLiveData<ResponseResult<InboxMsgModel>>()
     val allInboxMessagesLiveData get() = _allInboxMessagesLiveData
 

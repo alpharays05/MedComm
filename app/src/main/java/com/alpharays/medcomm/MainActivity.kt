@@ -17,8 +17,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.alpharays.medcomm.ui.theme.MedCommTheme
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,13 +50,13 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-fun setupMedComm() {
-    CommunityUtils.setAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mjc3N2Q4MjVmZmMyNTA3MmE5NDBiNyIsImlhdCI6MTcwOTU1NzA4NH0.C0lTg0jf6gtUfBFGX7DAMJQ8kVKK0FboDC547pkC4Is")
+fun setupMedComm(context: Context) {
+    CommunityUtils.setAuthToken(context, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mjc3N2Q4MjVmZmMyNTA3MmE5NDBiNyIsImlhdCI6MTcwOTU1NzA4NH0.C0lTg0jf6gtUfBFGX7DAMJQ8kVKK0FboDC547pkC4Is")
 }
 
 fun openMediCommFma(context: Context) {
     MedCommRouter.initiateMedCommRouter(context)
-    setupMedComm()
+    setupMedComm(context)
     MedCommRouter.startDummyActivity(context)
 }
 

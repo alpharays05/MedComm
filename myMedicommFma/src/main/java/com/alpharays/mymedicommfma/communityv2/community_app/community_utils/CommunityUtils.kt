@@ -11,7 +11,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
-import com.alpharays.mymedicommfma.common.connectivity.NetworkConnectivityObserver
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.NO_CONNECTION
 import com.alpharays.mymedicommfma.communityv2.MedCommToast
@@ -36,8 +34,7 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.commun
 
 class CommunityUtils {
     companion object {
-        val context = MedCommRouter.context
-        fun setAuthToken(token: String) {
+        fun setAuthToken(context: Context, token: String) {
             val authTokenSharedPref = context.getSharedPreferences(
                 MedCommRouter.AUTH_TOKEN_SHARED_PREF,
                 Context.MODE_PRIVATE
@@ -45,7 +42,7 @@ class CommunityUtils {
             authTokenSharedPref.edit().putString(MedCommRouter.AUTH_TOKEN_KEY, token).apply()
         }
 
-        fun getAuthToken(): String {
+        fun getAuthToken(context: Context): String {
             val authTokenSharedPref = context.getSharedPreferences(
                 MedCommRouter.AUTH_TOKEN_SHARED_PREF,
                 Context.MODE_PRIVATE
@@ -53,7 +50,7 @@ class CommunityUtils {
             return authTokenSharedPref.getString(MedCommRouter.AUTH_TOKEN_KEY, null).toString()
         }
 
-        fun setOneTimePostId(postId: String) {
+        fun setOneTimePostId(context: Context, postId: String) {
             val postIdSharedPref = context.getSharedPreferences(
                 MedCommRouter.ONE_TIME_POST_ID,
                 Context.MODE_PRIVATE
@@ -61,7 +58,7 @@ class CommunityUtils {
             postIdSharedPref.edit().putString(MedCommRouter.ONE_TIME_POST_ID_KEY, postId).apply()
         }
 
-        fun getOneTimePostId(): String {
+        fun getOneTimePostId(context: Context): String {
             val postIdSharedPref = context.getSharedPreferences(
                 MedCommRouter.ONE_TIME_POST_ID,
                 Context.MODE_PRIVATE
@@ -70,9 +67,15 @@ class CommunityUtils {
         }
 
         @Composable
-        fun <T> ComposableNoNetworkFound(context: Context, modifier: Modifier, viewModel: T, toShow: Boolean = true) {
+        fun <T> ComposableNoNetworkFound(
+            context: Context,
+            networkStatus: ConnectivityObserver.Status,
+            modifier: Modifier,
+            viewModel: T,
+            toShow: Boolean = true,
+        ) {
             var reLoadScreen by remember { mutableStateOf(false) }
-            if(toShow){
+            if (toShow) {
                 val painter = painterResource(id = R.drawable.no_internet)
                 Column(
                     modifier = modifier.padding(top = 10.dp, start = 5.dp, end = 5.dp),
@@ -89,13 +92,21 @@ class CommunityUtils {
                     Text(
                         modifier = modifier,
                         text = MedCommRouter.SOMETHING_WENT_WRONG,
-                        style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.W600, textAlign = TextAlign.Center)
+                        style = TextStyle(
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.W600,
+                            textAlign = TextAlign.Center
+                        )
                     )
 
                     Text(
                         modifier = modifier,
                         text = MedCommRouter.NO_CONNECTION_MSG,
-                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.W300, textAlign = TextAlign.Center)
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.W300,
+                            textAlign = TextAlign.Center
+                        )
                     )
 
                     OutlinedButton(
@@ -117,8 +128,8 @@ class CommunityUtils {
                 }
             }
 
-            if(reLoadScreen){
-                if(isInternetAvailable(context) == ConnectivityObserver.Status.Unavailable){
+            if (reLoadScreen) {
+                if (networkStatus == ConnectivityObserver.Status.Unavailable) {
                     MedCommToast.showToast(context, NO_CONNECTION)
                     reLoadScreen = false
                     return
@@ -129,39 +140,27 @@ class CommunityUtils {
 
         @Composable
         fun <T> ScreenReload(viewModel: T) {
-            LaunchedEffect(Unit){
-                when(viewModel){
+            LaunchedEffect(Unit) {
+                when (viewModel) {
                     is CommunityViewModel -> {
-                        viewModel.retryGettingPosts()
+                        viewModel.refreshCommunityPosts()
                     }
                 }
             }
         }
 
-
-        private lateinit var connectivityObserver: ConnectivityObserver
-        @Composable
-        fun isInternetAvailable(context: Context): ConnectivityObserver.Status {
-            connectivityObserver = NetworkConnectivityObserver(context)
-            val status by connectivityObserver.observe().collectAsState(
-                initial = ConnectivityObserver.Status.Unavailable
-            )
-            return status
-        }
+//        private lateinit var connectivityObserver: ConnectivityObserver
+//        @Composable
+//        fun isInternetAvailable(context: Context): ConnectivityObserver.Status {
+//            connectivityObserver = NetworkConnectivityObserver(context)
+//            val status by connectivityObserver.observe().collectAsState(
+//                initial = ConnectivityObserver.Status.Unavailable
+//            )
+//            return status
+//        }
 
         fun getMedicoColor(context: Context, color: Int): Int {
             return context.getColor(color)
         }
-
-        object NetworkCheck{
-            private var alreadyLost = false
-            fun setNetworkStatus(status: Boolean){
-                alreadyLost = status
-            }
-            fun isNetworkAlreadyLost(): Boolean{
-                return alreadyLost
-            }
-        }
-
     }
 }

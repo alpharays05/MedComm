@@ -10,11 +10,12 @@ import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.commun
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.CommunityRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class CommunityUseCase(
+class CommunityUseCase @Inject constructor(
     private val communityRepository: CommunityRepository,
 ) {
-    fun getAllCommunityPosts(token: String): Flow<ResponseResult<AllCommunityPostsParent>> = flow {
+    operator fun invoke(token: String): Flow<ResponseResult<AllCommunityPostsParent>> = flow {
         emit(ResponseResult.Loading())
         val response = try {
             val allPostsList = communityRepository.getAllPostsList(token)
@@ -26,7 +27,7 @@ class CommunityUseCase(
         emit(response)
     }
 
-    fun addNewCommunityPost(
+    operator fun invoke(
         token: String,
         addNewCommunityPost: AddNewCommunityPost,
     ): Flow<ResponseResult<NewPostResponse>> = flow {
@@ -40,7 +41,7 @@ class CommunityUseCase(
         emit(response)
     }
 
-    fun getAllCurPostComments(
+    operator fun invoke(
         token: String,
         postId: AllCommentsRequestBody,
     ): Flow<ResponseResult<AllCommentsResponse>> = flow {

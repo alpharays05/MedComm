@@ -2,8 +2,11 @@ package com.alpharays.mymedicommfma.communityv2.community_app.presentation.messa
 
 import androidx.lifecycle.ViewModel
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.SocketIO
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class InboxViewModel(
+@HiltViewModel
+class InboxViewModel @Inject constructor(
     private val socketIO: SocketIO,
 ) : ViewModel() {
     init {

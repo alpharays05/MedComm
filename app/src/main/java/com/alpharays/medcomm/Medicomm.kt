@@ -1,6 +1,7 @@
 package com.alpharays.medcomm
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
-class Medicomm: Application() {
-}
+@HiltAndroidApp
+class Medicomm: Application() {}

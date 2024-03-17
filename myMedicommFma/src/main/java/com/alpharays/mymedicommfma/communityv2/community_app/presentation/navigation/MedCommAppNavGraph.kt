@@ -16,8 +16,6 @@ fun AppNavGraph(
     navController: NavHostController
 ) {
     val context = LocalContext.current
-
-
     NavHost(
         navController = navController,
         startDestination = DependencyProvider.communityFeature().communityRoute

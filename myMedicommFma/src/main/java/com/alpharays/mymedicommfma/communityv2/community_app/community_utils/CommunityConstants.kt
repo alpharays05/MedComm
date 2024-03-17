@@ -14,11 +14,12 @@ object CommunityConstants {
     const val GET_ALL_CHATS = "/chats/getallchats"
 
     // navigation routes
-    const val COMMUNITY_SCREEN_ROUTE = "community_screen"
-    const val DIRECT_MESSAGE_SCREEN_ROUTE = "direct_message_screen"
-    const val MESSAGE_INBOX_SCREEN_ROUTE = "message_inbox_screen"
-    const val ADD_NEW_POST_SCREEN_ROUTE = "add_new_community_post_screen"
-    const val COMMENTS_SCREEN_ROUTE = "comments_screen"
+    const val COMMUNITY_SCREEN_ROUTE = "community_screen_route"
+    const val GLOBAL_COMMUNITY_SEARCH_SCREEN_ROUTE = "global_community_screen_route"
+    const val DIRECT_MESSAGE_SCREEN_ROUTE = "direct_message_screen_route"
+    const val MESSAGE_INBOX_SCREEN_ROUTE = "message_inbox_screen_route"
+    const val ADD_NEW_POST_SCREEN_ROUTE = "add_new_community_post_screen_route"
+    const val COMMENTS_SCREEN_ROUTE = "comments_screen_route"
 
     // TODO : community app not linked to room db -> only initialized
     const val MEDICO_COMMUNITY_TABLE = "medico_community_table"
@@ -29,12 +30,16 @@ object CommunityConstants {
     const val SUPPORT_POST_CD = "Support Post"
     const val INSIGHTFUL_POST_CD = "Insightful Post"
     const val FUNNY_POST_CD = "Funny Post"
+    const val CAN_NOT_REACT_NO_CONNECTION = "Can not react, No connection"
+    const val CAN_NOT_COMMENT_NO_CONNECTION = "Can not comment, No connection"
+    const val CAN_NOT_REPOST_NO_CONNECTION = "Can not comment, No connection"
+    const val CAN_NOT_SEND_NO_CONNECTION = "No connection, try again later"
 
     // socket events
     const val MESSAGE_REPLY_EVENT = "reply"
-    const val SEND_MESSAGE = "send_message"
-    const val JOIN_ROOM = "join_room"
-    const val MESSAGES_ROOM = "message_room"
+    const val SEND_MESSAGE = "sendmessage"
+    const val JOIN_ROOM = "joinroom"
+    const val MESSAGES_ROOM = "messageroom"
 
     const val LIKE_OPTION = "Like"
     const val COMMENT_OPTION = "Comment"

@@ -8,8 +8,9 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.commun
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allcurmessages.AllCurrMessages
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allinboxmessages.InboxMsgModel
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.repository.MessagesRepository
+import javax.inject.Inject
 
-class MessagesUseCase(
+class MessagesUseCase @Inject constructor(
     private val messagesRepository: MessagesRepository
 ) {
     suspend operator fun invoke(token: String, newChat: NewChat): ResponseResult<AddNewChatModel> {

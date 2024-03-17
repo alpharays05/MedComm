@@ -1,6 +1,7 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.presentation.message_screen.message_inbox
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,16 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,19 +33,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.common.global_search.GlobalSearchBox
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allinboxmessages.ChatMsg
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.manRopeFontFamily
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.size
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.spacing
 import java.util.Calendar
-
 
 @Composable
 fun MessageInboxScreen(navController: NavController) {
@@ -64,9 +60,19 @@ fun MessageInboxScreen(navController: NavController) {
         mutableStateOf<Array<ChatMsg>?>(null)
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize().padding(5.dp)) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 1f))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 1f))
+                .padding(MaterialTheme.spacing.extraSmall)
+        ) {
             ComposableMessageInboxSearch(
+                navController = navController,
                 searchList = searchList,
                 onReset = {
                     newSearchedList = originalList
@@ -88,13 +94,13 @@ fun MessageInboxScreen(navController: NavController) {
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposableMessageInboxSearch(
     searchList: Array<ChatMsg>?,
     onReset: () -> Unit,
     onNewSearchedList: (Array<ChatMsg>) -> Unit,
+    navController: NavController,
 ) {
     var messageSearchText by remember {
         mutableStateOf("")
@@ -115,84 +121,8 @@ fun ComposableMessageInboxSearch(
         mutableStateOf<ChatMsg?>(null)
     }
 
-    Row(
-        verticalAlignment = Alignment.Top,
-        modifier = Modifier.padding(top = 2.dp),
-    ) {
-        SearchBar(
-            modifier = Modifier.weight(0.85f).padding(5.dp),
-            shape = RoundedCornerShape(10.dp),
-            query = messageSearchText,
-            onQueryChange = { query ->
-                messageSearchText = query
-                if (query.lowercase().isEmpty()) {
-                    messageSearchItems.clear()
-                    messageSearchItems.addAll(messageSearchHistoryItems)
-                } else {
-                    val filteredItems = searchList?.filter { chatMsg ->
-                        chatMsg.lastMessage?.lowercase()?.contains(query.lowercase()) == true
-                    }.orEmpty()
-                    messageSearchItems.clear()
-                    messageSearchItems.addAll(filteredItems)
-                }
-            },
-            onSearch = {
-                searchedChatMsg?.let { chatMsg ->
-                    messageSearchHistoryItems.add(chatMsg)
-                }
-                searchBarActive = false
-                onNewSearchedList(messageSearchItems.toTypedArray())
-            },
-            active = searchBarActive,
-            onActiveChange = {
-                searchBarActive = it
-            },
-            placeholder = {
-                Text(text = "Search messages")
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon"
-                )
-            },
-            trailingIcon = {
-                Icon(
-                    modifier = Modifier.clickable {
-                        if (messageSearchText.isNotEmpty()) messageSearchText = ""
-                        else {
-                            searchBarActive = false
-                        }
-                        onReset()
-                    },
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close Icon"
-                )
-            }
-        ) {
-            LazyColumn{
-                items(messageSearchItems){
-                    Row(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .clickable {
-                                searchedChatMsg = it
-                            },
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            modifier = Modifier.padding(10.dp),
-                            imageVector = Icons.Default.History,
-                            contentDescription = "History Icon"
-                        )
-                        Text(text = it.lastMessage.toString())
-                    }
-                }
-            }
-        }
-    }
+    GlobalSearchBox(navController)
 }
-
 
 @Composable
 fun ComposableMessageInboxList(
@@ -262,12 +192,12 @@ fun ComposableMessageInboxList(
 
     onInboxListReceived(list)
 
-    if(!newSearchedList.isNullOrEmpty()){
+    if (!newSearchedList.isNullOrEmpty()) {
         list = newSearchedList
     }
 
     LazyColumn(
-        modifier = Modifier.padding(5.dp)
+        modifier = Modifier.padding(MaterialTheme.spacing.extraSmall)
     ) {
         items(list) {
             ComposableMessageBoxCard(it, navController)
@@ -275,19 +205,32 @@ fun ComposableMessageInboxList(
     }
 }
 
-
 @Composable
 fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
+    val style1 = TextStyle(
+        fontWeight = FontWeight.W700,
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+        fontFamily = manRopeFontFamily,
+        color = MaterialTheme.colorScheme.surface
+    )
+    val style2 = TextStyle(
+        fontWeight = FontWeight.W400,
+        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+        fontFamily = manRopeFontFamily,
+        color = MaterialTheme.colorScheme.surface
+    )
     Card(
         modifier = Modifier
-            .padding(5.dp)
             .fillMaxWidth()
-            .border(0.5.dp, Color.White, RoundedCornerShape(5.dp))
+            .border(0.5.dp, Color.White, RoundedCornerShape(MaterialTheme.spacing.extraSmall))
+            .padding(MaterialTheme.spacing.extraSmall)
             .clickable {
                 navController.navigate(CommunityAppScreens.DirectMessageScreen.route)
             },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        shape = RoundedCornerShape(8.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f)
+        ),
+        shape = RoundedCornerShape(MaterialTheme.spacing.small)
     ) {
         Row(
             verticalAlignment = Alignment.Top,
@@ -300,9 +243,9 @@ fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
             Image(
                 modifier = Modifier
                     .padding(top = 8.dp)
-                    .size(45.dp)
-                    .border(1.dp, Color(color), RoundedCornerShape(20.dp))
-                    .clip(RoundedCornerShape(20.dp)),
+                    .size(MaterialTheme.size.large)
+                    .border(1.dp, Color(color), RoundedCornerShape(MaterialTheme.size.defaultIconSize))
+                    .clip(RoundedCornerShape(MaterialTheme.size.defaultIconSize)),
                 painter = painter,
                 contentDescription = "User avatar"
             )
@@ -311,29 +254,21 @@ fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
             ) {
                 Text(
                     text = "Dr Shivang Gautam",
-                    style = TextStyle(
-                        fontWeight = FontWeight.W400,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
+                    style = style1
                 )
                 Text(
                     text = chatMsg.lastMessage ?: "NA",
-                    style = TextStyle(
-                        fontWeight = FontWeight.W400,
-                        fontSize = 12.sp
+                    style = style1.copy(
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        fontWeight = FontWeight.W500
                     )
                 )
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp),
+                        .padding(MaterialTheme.spacing.extraSmall),
                     color = Color.Gray,
-                    style = TextStyle(
-                        fontWeight = FontWeight.W400,
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.End
-                    ),
+                    style = style2.copy(textAlign = TextAlign.End),
                     text = chatMsg.lastMsgTimeStamp ?: "NA"
                 )
             }
@@ -345,5 +280,5 @@ fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
 @Preview
 @Composable
 fun MessageInboxScreenPreview() {
-
+//    MessagesSearchBox(navController)
 }

@@ -3,8 +3,8 @@ package com.alpharays.mymedicommfma.communityv2.community_app.presentation.commu
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,7 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -36,8 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreInterceptKeyBeforeSoftKeyboard
@@ -49,50 +49,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.alpharays.mymedicommfma.R
-import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
-import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.KEYBOARD_CLOSE_ON_BACK_PRESS_KEY_CODE
-import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.getCommunityViewModel
+import com.alpharays.mymedicommfma.communityv2.MedCommToast
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.CommunityPost
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.allcomments.AllCommentsData
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.FocusedTextColor
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.OnPrimaryFixed
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary500
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.manRopeFontFamily
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.size
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.spacing
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.workSansFontFamily
 
 @Composable
 fun CommunityFullPostScreen(
     navController: NavController,
-    isInternetAvailable: ConnectivityObserver.Status,
-    postCommentsSharedViewModel: PostCommentsSharedViewModel,
+    postSharedViewModel: PostSharedViewModel = hiltViewModel(),
+    currPostDetailViewModel: CurrPostDetailViewModel = hiltViewModel(),
 ) {
-    val communityUseCase = MedCommRouter
-        .getCommunityInjector()
-        .getCommunityUseCase()
-    val currPostCommentsViewModel: CurrPostCommentsViewModel = getCommunityViewModel(communityUseCase)
-
-    val allCommentsResponseList by currPostCommentsViewModel.allCommentsStateFlow.collectAsStateWithLifecycle()
-
-    var allCommentsData by remember {
-        mutableStateOf<List<AllCommentsData?>?>(null)
-    }
-
-    allCommentsResponseList.allComments?.let {
-        allCommentsData = it
-    }
-
+    val allCommentsResponseList by currPostDetailViewModel.allCommentsStateFlow.collectAsStateWithLifecycle()
+    val allCommentsData = allCommentsResponseList.allComments
+    val currentPost by postSharedViewModel.postContentState.collectAsStateWithLifecycle()
     println("allCommentsResponseList :: $allCommentsResponseList")
-
-    val postContentState by postCommentsSharedViewModel.postContentState.collectAsStateWithLifecycle()
-    var post by remember {
-        mutableStateOf(CommunityPost())
-    }
-
-    postContentState?.let {
-        post = it
-    }
 
     Scaffold(
         topBar = {
@@ -102,68 +85,30 @@ fun CommunityFullPostScreen(
             AnimatedVisibility(true) {
                 CommentsBottomBarComposable {}
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = .95f)
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
                 .padding(4.dp)
         ) {
-            PostComposableContent(post, allCommentsData, postCommentsSharedViewModel)
-        }
-    }
-}
-
-
-@Composable
-fun PostComposableContent(
-    post: CommunityPost,
-    allCommentsData: List<AllCommentsData?>?,
-    viewModel: PostCommentsSharedViewModel,
-) {
-    val context = LocalContext.current
-    val navController = rememberNavController()
-    Card(
-        modifier = Modifier
-            .padding(bottom = 16.dp)
-            .fillMaxWidth()
-            .border(0.9.dp, Color(0xFF3B4557), RoundedCornerShape(6.dp))
-            .clip(RoundedCornerShape(6.dp))
-            .padding(horizontal = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        shape = RoundedCornerShape(10.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(
-                start = 8.dp,
-                end = 8.dp,
-                top = 8.dp,
-                bottom = 4.dp
+            PostComposableContent(
+                post = currentPost ?: CommunityPost(),
+                allCommentsData = allCommentsData,
+                viewModel = postSharedViewModel
             )
-        ) {
-            ComposableCommunityPostUpperRow(context, post)
-            ComposableCommunityPostContent(context, post, viewModel)
-            ComposableCommunityPostLowerRow(context, post)
-            ComposableCommunityPostLastRow(context, false) {}
-            Divider()
-            Row(
-                modifier = Modifier.padding(vertical = 12.dp)
-            ) {
-                Text(text = "Comments")
-            }
-            ComposableAllComments(allCommentsData)
         }
     }
 }
-
 
 @Composable
 fun CommentsTopBarComposable() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(Color.White),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-        shape = RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp)
+        shape = RoundedCornerShape(0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -186,20 +131,78 @@ fun CommentsTopBarComposable() {
     }
 }
 
+@Composable
+fun PostComposableContent(
+    post: CommunityPost,
+    allCommentsData: List<AllCommentsData?>?,
+    viewModel: PostSharedViewModel,
+) {
+    val context = LocalContext.current
+    val navController = rememberNavController()
+    val cardBorderBrush = Brush.linearGradient(colors = listOf(OnPrimaryFixed, Color.Transparent, OnPrimaryFixed, Color.Transparent))
+    val style = TextStyle(
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+        fontFamily = manRopeFontFamily,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+        textAlign = TextAlign.Start
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MaterialTheme.spacing.extraSmall)
+            .border(1.dp, cardBorderBrush, RoundedCornerShape(MaterialTheme.size.small)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f)),
+        shape = RoundedCornerShape(MaterialTheme.size.small)
+    ) {
+        Column(
+            modifier = Modifier.padding(
+                start = 8.dp,
+                end = 8.dp,
+                top = 8.dp,
+                bottom = 4.dp
+            )
+        ) {
+            ComposableCommunityPostUpperRow(context, post)
+            ComposableCommunityPostContent(context, post, viewModel)
+            ComposableCommunityPostLowerRow(context, post)
+            ComposableCommunityPostLastRow(context, showCommentsAgain = false) {}
+            HorizontalDivider()
+            Row(
+                modifier = Modifier.padding(vertical = 12.dp)
+            ) {
+                Text(text = "Comments", style = style)
+            }
+            ComposableAllComments(allCommentsData)
+        }
+    }
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CommentsBottomBarComposable(
     onBottomBarStatusChanged: (Boolean) -> Unit,
 ) {
+    val context = LocalContext.current
     var userComment by remember { mutableStateOf("") }
     val painter = painterResource(id = R.drawable.doctor_profile)
     val focusManager = LocalFocusManager.current
     var isFocused by remember { mutableStateOf(true) }
     var topPadding by remember { mutableStateOf(0.dp) }
-    var verticalAlignment by remember {
-        mutableStateOf(Alignment.CenterVertically)
-    }
+    var verticalAlignment by remember { mutableStateOf(Alignment.CenterVertically) }
+    val style1 = TextStyle(
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontFamily = manRopeFontFamily,
+        fontWeight = FontWeight.W500,
+        color = FocusedTextColor.copy(alpha = .5f),
+        textAlign = TextAlign.Start
+    )
+    val style2 = TextStyle(
+        textAlign = TextAlign.End,
+        color = FocusedTextColor,
+        fontWeight = FontWeight.W600
+    )
 
     LaunchedEffect(isFocused) {
         onBottomBarStatusChanged(isFocused)
@@ -214,7 +217,10 @@ fun CommentsBottomBarComposable(
             focusManager.clearFocus()
             isFocused = false
         }
-        Divider()
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = MaterialTheme.spacing.small),
+            color = MaterialTheme.colorScheme.surface.copy(alpha = .08f)
+        )
         Row(
             modifier = Modifier
                 .padding(horizontal = 4.dp, vertical = 2.dp)
@@ -252,9 +258,9 @@ fun CommentsBottomBarComposable(
                     userComment = newText
                 },
                 placeholder = {
-                    Text(text = "Leave your thoughts here...")
+                    Text(text = "Leave your thoughts here ...", style = style1)
                 },
-                textStyle = TextStyle(fontSize = 16.sp, color = Color(0xFF00897B)),
+                textStyle = style1.copy(color = FocusedTextColor),
                 maxLines = 5,
             )
         }
@@ -262,102 +268,100 @@ fun CommentsBottomBarComposable(
         if (isFocused) {
             topPadding = 10.dp
             verticalAlignment = Alignment.Top
-            Divider()
+            HorizontalDivider()
             Text(
                 text = "Post",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.W500,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
-                textAlign = TextAlign.End
+                    .padding(
+                        top = MaterialTheme.spacing.avgSmall,
+                        bottom = MaterialTheme.spacing.avgSmall,
+                        end = MaterialTheme.spacing.medSmall,
+                    )
+                    .clickable {
+                        MedCommToast.showToast(context, "Commenting...")
+                    },
+                style = style2
             )
         }
     }
 }
 
-
 @Composable
 fun ComposableAllComments(allCommentsData: List<AllCommentsData?>?) {
-    allCommentsData?.let { allCommentsResponse ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(6.dp),
-        ) {
-            items(allCommentsResponse) { allCommentsResult ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp),
-                    verticalAlignment = Alignment.Top
+    val style = TextStyle(
+        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+        fontFamily = workSansFontFamily,
+        fontWeight = FontWeight.W400,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+        textAlign = TextAlign.Start
+    )
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        items(allCommentsData ?: emptyList()) { allCommentsResult ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MaterialTheme.spacing.extraSmall, vertical = MaterialTheme.spacing.small),
+                verticalAlignment = Alignment.Top
+            ) {
+                Image(
+                    modifier = Modifier.size(MaterialTheme.size.defaultIconSize),
+                    painter = painterResource(id = R.drawable.doctor_profile),
+                    contentDescription = "profile icon",
+                )
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Primary500.copy(alpha = .1f)),
+                    modifier = Modifier.padding(start = MaterialTheme.spacing.extraSmall),
+                    shape = RoundedCornerShape(MaterialTheme.spacing.small)
                 ) {
-                    Image(
-                        modifier = Modifier.size(MaterialTheme.size.defaultIconSize),
-                        painter = painterResource(id = R.drawable.doctor_profile),
-                        contentDescription = "profile icon",
-                    )
-
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFCBD6DF)),
-                        modifier = Modifier.padding(start = 4.dp),
-                        shape = RoundedCornerShape(2.dp)
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.avgLessSmall),
                     ) {
-                        Column(
+                        Row(
                             modifier = Modifier
-                                .padding(4.dp)
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .padding(bottom = MaterialTheme.spacing.smallest),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 2.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = allCommentsResult?.commentedByUserName ?: "User name",
-                                    fontSize = 14.sp,
-                                )
-                                Icon(
-                                    modifier = Modifier.size(MaterialTheme.size.lessMedium),
-                                    imageVector = Icons.Default.MoreVert,
-                                    contentDescription = "",
-                                    tint = Color.Unspecified
-                                )
-                            }
+                            Text(
+                                text = allCommentsResult?.commentedByUserName ?: "--",
+                                style = style.copy(fontWeight = FontWeight.W600)
+                            )
+                            Icon(
+                                modifier = Modifier.size(MaterialTheme.size.defaultIconSize),
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "",
+                                tint = Color.Unspecified
+                            )
+                        }
 
-                            Row(
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            ) {
-                                Text(
-                                    text = allCommentsResult?.commentedByUserId
-                                        ?: "About commented by id",
-                                    fontSize = 10.sp,
-                                    color = Color.Black.copy(alpha = 0.7f)
-                                )
-                            }
+                        Row(
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        ) {
+                            Text(
+                                text = allCommentsResult?.commentedByUserId ?: "--",
+                                style = style
+                            )
+                        }
 
-                            Row(
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            ) {
-                                Text(
-                                    text = allCommentsResult?.commentContent ?: "comment content",
-                                    fontSize = 10.sp,
-                                )
-                            }
+                        Row(
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        ) {
+                            Text(
+                                text = allCommentsResult?.commentContent ?: "--",
+                                style = style.copy(fontWeight = FontWeight.W500)
+                            )
+                        }
 
-                            Row(
-                                modifier = Modifier.padding(bottom = 2.dp)
-                            ) {
-                                Text(
-                                    text = (allCommentsResult?.replies?.size
-                                        ?: "0 replies").toString(),
-                                    fontSize = 10.sp,
-                                    color = Color.Black.copy(alpha = 0.7f)
-                                )
-                            }
+                        Row(
+                            modifier = Modifier.padding(bottom = 2.dp)
+                        ) {
+                            Text(
+                                text = (allCommentsResult?.replies?.size ?: "").toString(),
+                                style = style
+                            )
                         }
                     }
                 }
@@ -366,13 +370,7 @@ fun ComposableAllComments(allCommentsData: List<AllCommentsData?>?) {
     }
 }
 
-
 @Preview
 @Composable
 fun CommentsScreenPreview() {
-    val a = AllCommentsData("1", "2", "3", "4", "5")
-    val b = AllCommentsData("1", "2", "3", "4", "5")
-    val c = AllCommentsData("1", "2", "3", "4", "5")
-    val allCommentsData = listOf(a, b, c)
-    ComposableAllComments(allCommentsData)
 }

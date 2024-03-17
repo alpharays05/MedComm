@@ -5,7 +5,9 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Phone
@@ -35,6 +37,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -59,13 +62,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieAnimation
@@ -73,40 +73,37 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.alpharays.mymedicommfma.R
-import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.DirectMessage
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.BluishGray
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.manRopeFontFamily
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.spacing
 import kotlinx.coroutines.launch
 
 @Composable
-fun DirectMessageScreen(navController: NavController) {
-    val socketIO = MedCommRouter
-        .getCommunityInjector()
-        .getSocketIO()
-    val messagesScreenUseCase = MedCommRouter
-        .getCommunityInjector()
-        .getMessagesUseCase()
-    val factory = object : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return DirectMessageViewModel(socketIO, messagesScreenUseCase) as T
-        }
-    }
-    val directMessageViewModel: DirectMessageViewModel = viewModel(factory = factory)
+fun DirectMessageScreen(
+    navController: NavController,
+    directMessageViewModel: DirectMessageViewModel = hiltViewModel(),
+) {
     Surface(modifier = Modifier.fillMaxSize()) {
         ComposableDirectMessageScreen(navController, directMessageViewModel)
     }
 }
 
-
 @Composable
-fun ComposableDirectMessageScreen(navController: NavController, directMessageViewModel: DirectMessageViewModel) {
+fun ComposableDirectMessageScreen(
+    navController: NavController,
+    directMessageViewModel: DirectMessageViewModel,
+) {
     Scaffold(
         topBar = {
             ComposableUserTopBar(navController)
         },
         bottomBar = {
             ComposableUserBottomBar(navController, directMessageViewModel)
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f)
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -125,9 +122,16 @@ fun ComposableDirectMessageScreen(navController: NavController, directMessageVie
     }
 }
 
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ComposableUserTopBar(navController: NavController) {
+    val style = TextStyle(
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontFamily = manRopeFontFamily,
+        fontWeight = FontWeight.W500,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+    )
+    val painter = painterResource(id = R.drawable.doctor_profile)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -135,55 +139,60 @@ fun ComposableUserTopBar(navController: NavController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Go Back"
+            modifier = Modifier
+                .clickable {
+                    navController.navigate(CommunityAppScreens.MessageInboxScreen.route) {
+//                        popUpTo(0) // TODO: 0 ? honto dis ka ? (for real?)
+                        navController.popBackStack()
+                    }
+                }
+                .padding(end = MaterialTheme.spacing.small),
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "go back icon",
+            tint = BluishGray
         )
-
-        val painter = painterResource(id = R.drawable.doctor_profile)
-        val context = LocalContext.current
-        val color = CommunityUtils.getMedicoColor(context, R.color.bluish_gray)
         Image(
             modifier = Modifier
                 .padding(start = 5.dp)
                 .size(45.dp)
-                .border(1.dp, Color(color), RoundedCornerShape(20.dp))
+                .border(1.dp, BluishGray, RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(20.dp)),
             painter = painter,
             contentDescription = "User avatar"
         )
 
         Text(
-            modifier = Modifier.padding(start = 15.dp).weight(1f),
+            modifier = Modifier
+                .padding(start = 15.dp)
+                .weight(1f)
+                .basicMarquee(Int.MAX_VALUE),
             text = "Dr. Shivang",
             maxLines = 1,
-            overflow = Ellipsis,
-            style = TextStyle(
-                fontWeight = FontWeight.W400,
-                fontSize = 16.sp,
-                fontFamily = FontFamily.Monospace
-            )
+            style = style
         )
 
         Icon(
             modifier = Modifier.padding(start = 12.dp),
             imageVector = Icons.Default.VideoCall,
-            contentDescription = "Video call"
+            contentDescription = "Video call",
+            tint = BluishGray
         )
 
         Icon(
             modifier = Modifier.padding(start = 8.dp),
             imageVector = Icons.Default.Phone,
-            contentDescription = "Voice call"
+            contentDescription = "Voice call",
+            tint = BluishGray
         )
 
         Icon(
             modifier = Modifier.padding(start = 8.dp),
             imageVector = Icons.Default.MoreVert,
-            contentDescription = "More options"
+            contentDescription = "More options",
+            tint = BluishGray
         )
     }
 }
-
 
 @Composable
 fun ComposableUserMessages(modifier: Modifier, navController: NavController) {
@@ -289,11 +298,12 @@ fun ComposableUserMessages(modifier: Modifier, navController: NavController) {
     }
 }
 
-
 @Composable
 fun ComposableSenderCard(modifier: Modifier, message: DirectMessage) {
     Box(
-        modifier.padding(start = 30.dp).fillMaxSize(),
+        modifier
+            .padding(start = 30.dp)
+            .fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
         Card(
@@ -302,12 +312,14 @@ fun ComposableSenderCard(modifier: Modifier, message: DirectMessage) {
             shape = RoundedCornerShape(15.dp, 0.dp, 15.dp, 15.dp)
         ) {
             Column(modifier.padding(10.dp)) {
-                Text(text = message.message ?: "NA")
+                Text(
+                    text = message.message ?: "",
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
+                )
             }
         }
     }
 }
-
 
 @Composable
 fun ComposableReceiverCard(modifier: Modifier, message: DirectMessage) {
@@ -318,15 +330,20 @@ fun ComposableReceiverCard(modifier: Modifier, message: DirectMessage) {
             shape = RoundedCornerShape(0.dp, 15.dp, 15.dp, 15.dp)
         ) {
             Column(modifier.padding(10.dp)) {
-                Text(text = message.message ?: "NA")
+                Text(
+                    text = message.message ?: "",
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
+                )
             }
         }
     }
 }
 
-
 @Composable
-fun ComposableUserBottomBar(navController: NavController, directMessageViewModel: DirectMessageViewModel) {
+fun ComposableUserBottomBar(
+    navController: NavController,
+    directMessageViewModel: DirectMessageViewModel,
+) {
     var messageText by remember {
         mutableStateOf("")
     }
@@ -437,7 +454,6 @@ fun ComposableUserBottomBar(navController: NavController, directMessageViewModel
     }
 }
 
-
 @Composable
 fun ComposableAttachmentItems() {
     val context = LocalContext.current
@@ -473,12 +489,11 @@ fun ComposableAttachmentItems() {
     }
 }
 
-
 @Composable
 fun ComposableLottieComposition(
     modifier: Modifier,
     attachmentName: String,
-    attachmentId: Int
+    attachmentId: Int,
 ) {
     Column(
         modifier.padding(5.dp),
@@ -502,7 +517,6 @@ fun ComposableLottieComposition(
         )
     }
 }
-
 
 @Preview
 @Composable

@@ -19,9 +19,12 @@ object MedCommRouter {
     const val API_SAFE_KEY_VALUE = "rueth8934otwurhrtgw0th30wow39u932tj"
 
     const val BASE_URL = "https://medico-ny1q.onrender.com/"
+    const val SOCKET_BASE_URL = "https://medico-socket-server.onrender.com/"
 
     const val APP_TAG = "APP_TAG"
     const val APP_TAG_ERROR = "APP_TAG_ERROR"
+
+    const val SHARED_PREFERENCE_NAME = "SHARED_PREFERENCE_MEDICO_COMMUNITY"
 
     const val AUTH_TOKEN_SHARED_PREF = "authTokenSharedPrefHighPriority"
     const val AUTH_TOKEN_KEY = "authToken"

@@ -18,7 +18,7 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.commun
 import kotlin.system.exitProcess
 
 @Composable
-inline fun <reified T : ViewModel> getCommunityViewModel(useCase: Any?): T {
+inline fun <reified T : ViewModel> getCommunityViewModel(useCase: Any): T {
     return viewModel(
         factory = CommunityAppViewModelFactory(useCase)
     )

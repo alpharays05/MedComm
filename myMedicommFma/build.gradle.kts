@@ -89,7 +89,7 @@ dependencies {
 
 
     //alaskaGemSdk
-    implementation("com.github.alpharays05:alaskasdk:0.0.3-alpha")
+    implementation("com.github.alpharays05:AlaskaSDK:0.0.4")
 
     implementation("com.airbnb.android:lottie-compose:6.2.0")
 }

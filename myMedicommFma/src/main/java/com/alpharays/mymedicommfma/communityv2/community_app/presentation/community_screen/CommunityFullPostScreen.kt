@@ -1,5 +1,6 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -36,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -58,8 +63,10 @@ import com.alpharays.mymedicommfma.communityv2.MedCommRouter.KEYBOARD_CLOSE_ON_B
 import com.alpharays.mymedicommfma.communityv2.MedCommToast
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.CommunityPost
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.allcomments.AllCommentsData
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.FocusedTextColor
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.OnPrimaryFixed
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary400
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary500
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.manRopeFontFamily
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.size
@@ -69,17 +76,18 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.
 @Composable
 fun CommunityFullPostScreen(
     navController: NavController,
-    postSharedViewModel: PostSharedViewModel = hiltViewModel(),
     currPostDetailViewModel: CurrPostDetailViewModel = hiltViewModel(),
+    postSharedViewModel: PostSharedViewModel = hiltViewModel()
 ) {
     val allCommentsResponseList by currPostDetailViewModel.allCommentsStateFlow.collectAsStateWithLifecycle()
     val allCommentsData = allCommentsResponseList.allComments
+
     val currentPost by postSharedViewModel.postContentState.collectAsStateWithLifecycle()
-    println("allCommentsResponseList :: $allCommentsResponseList")
 
     Scaffold(
+        modifier = Modifier.navigationBarsPadding(),
         topBar = {
-            CommentsTopBarComposable()
+            CommentsTopBarComposable(navController)
         },
         bottomBar = {
             AnimatedVisibility(true) {
@@ -91,33 +99,40 @@ fun CommunityFullPostScreen(
         Column(
             modifier = Modifier
                 .padding(it)
-                .padding(4.dp)
+                .padding(MaterialTheme.spacing.extraSmall)
         ) {
             PostComposableContent(
                 post = currentPost ?: CommunityPost(),
-                allCommentsData = allCommentsData,
-                viewModel = postSharedViewModel
+                allCommentsData = allCommentsData
             )
         }
     }
 }
 
 @Composable
-fun CommentsTopBarComposable() {
+fun CommentsTopBarComposable(navController: NavController) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-        shape = RoundedCornerShape(0.dp)
+        colors = CardDefaults.cardColors(Primary400),
+        elevation = CardDefaults.cardElevation(defaultElevation = MaterialTheme.spacing.avgExtraSmall),
+        shape = RoundedCornerShape(MaterialTheme.spacing.default)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(MaterialTheme.spacing.avgSmall),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier
+                    .padding(MaterialTheme.spacing.small)
+                    .clickable {
+                        navController.navigate(CommunityAppScreens.CommunityScreen.route) {
+                            popUpTo(CommunityAppScreens.CommunityFullPostScreen.route) {
+                                inclusive = true
+                            }
+                        }
+                    },
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "close post"
             )
@@ -134,8 +149,7 @@ fun CommentsTopBarComposable() {
 @Composable
 fun PostComposableContent(
     post: CommunityPost,
-    allCommentsData: List<AllCommentsData?>?,
-    viewModel: PostSharedViewModel,
+    allCommentsData: List<AllCommentsData?>?
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
@@ -164,17 +178,164 @@ fun PostComposableContent(
                 bottom = 4.dp
             )
         ) {
-            ComposableCommunityPostUpperRow(context, post)
-            ComposableCommunityPostContent(context, post, viewModel)
-            ComposableCommunityPostLowerRow(context, post)
-            ComposableCommunityPostLastRow(context, showCommentsAgain = false) {}
+            CommunityFullPostUpperRow(context, post)
+            CommunityFullPostContent(post)
+            CommunityFullPostLowerRow(post)
+            ComposableCommunityPostLastRow(context, showCommentsAgain = false) {} // composable re-used from Community Screen
             HorizontalDivider()
-            Row(
-                modifier = Modifier.padding(vertical = 12.dp)
-            ) {
+            Row(modifier = Modifier.padding(vertical = MaterialTheme.spacing.medSmall)) {
                 Text(text = "Comments", style = style)
             }
             ComposableAllComments(allCommentsData)
+        }
+    }
+}
+
+@Composable
+fun CommunityFullPostUpperRow(context: Context, post: CommunityPost) {
+    val style1 = TextStyle(
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontFamily = manRopeFontFamily,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+        textAlign = TextAlign.Start
+    )
+    val style2 = TextStyle(
+        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+        fontFamily = manRopeFontFamily,
+        fontWeight = FontWeight.W500,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+        textAlign = TextAlign.Start
+    )
+    Row(
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier.padding(MaterialTheme.spacing.lessSmall)
+    ) {
+        Image(
+            modifier = Modifier
+                .border(1.dp, Color.Gray, RoundedCornerShape(MaterialTheme.size.large3))
+                .size(MaterialTheme.size.large3)
+                .clip(RoundedCornerShape(MaterialTheme.size.large3)),
+            painter = painterResource(id = R.drawable.doctor_profile),
+            contentDescription = "doctor avatar"
+        )
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    start = MaterialTheme.spacing.avgSmall,
+                    end = MaterialTheme.spacing.lessSmall
+                ),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                modifier = Modifier.padding(MaterialTheme.spacing.extraSmall),
+                text = post.posterName ?: "--",
+                style = style1
+            )
+
+            Text(
+                modifier = Modifier.padding(start = MaterialTheme.spacing.extraSmall),
+                text = post.aboutDoc ?: "--",
+                maxLines = 1,
+                style = style2
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier.clickable {
+                MedCommToast.showToast(context, "Connecting")
+            }
+        ) {
+            Icon(
+                modifier = Modifier
+                    .padding(end = MaterialTheme.spacing.lessSmall)
+                    .size(MaterialTheme.size.smallIconSize),
+                imageVector = Icons.Default.PersonAdd,
+                contentDescription = "connect",
+                tint = Color.Blue.copy(alpha = .8f)
+            )
+            Text(
+                text = "Connect",
+                style = style1
+            )
+        }
+    }
+}
+
+@Composable
+fun CommunityFullPostContent(post: CommunityPost) {
+    val style1 = TextStyle(
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontFamily = manRopeFontFamily,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+        textAlign = TextAlign.Start
+    )
+    val style2 = TextStyle(
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontFamily = manRopeFontFamily,
+        fontWeight = FontWeight.W400,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+        textAlign = TextAlign.Start
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                vertical = MaterialTheme.spacing.avgSmall,
+                horizontal = MaterialTheme.spacing.extraSmall
+            )
+            .clip(RoundedCornerShape(MaterialTheme.spacing.lessSmall)),
+        colors = CardDefaults.cardColors(containerColor = Primary500.copy(alpha = .1f)),
+        shape = RoundedCornerShape(MaterialTheme.spacing.lessSmall)
+    ) {
+        Column(modifier = Modifier.padding(MaterialTheme.spacing.avgSmall)) {
+            Text(
+                text = post.postTitle ?: "--",
+                style = style1
+            )
+            Text(
+                modifier = Modifier.padding(top = MaterialTheme.spacing.medium),
+                text = post.postContent ?: "Nothing to see here .... ",
+                style = style2
+            )
+        }
+    }
+}
+
+@Composable
+fun CommunityFullPostLowerRow(post: CommunityPost) {
+    var reactionsCount = 0
+    post.reactions?.let { reactions ->
+        reactionsCount += reactions.like?.size ?: 0
+        reactionsCount += reactions.love?.size ?: 0
+        reactionsCount += reactions.celebrate?.size ?: 0
+        reactionsCount += reactions.support?.size ?: 0
+        reactionsCount += reactions.insightful?.size ?: 0
+        reactionsCount += reactions.funny?.size ?: 0
+    }
+    val commentsCount = post.comments?.size
+    val style = TextStyle(
+        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+        fontFamily = manRopeFontFamily,
+        fontWeight = FontWeight.W400,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+        textAlign = TextAlign.Start
+    )
+    Row(
+        modifier = Modifier.padding(vertical = MaterialTheme.spacing.medSmall, horizontal = MaterialTheme.spacing.lessSmall),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(text = "$reactionsCount Reactions", style = style)
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        commentsCount?.let {
+            Text(text = "$commentsCount Comments", style = style)
         }
     }
 }
@@ -240,6 +401,7 @@ fun CommentsBottomBarComposable(
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .imePadding()
                     .onFocusChanged {
                         isFocused = it.isFocused
                     }
@@ -301,7 +463,10 @@ fun ComposableAllComments(allCommentsData: List<AllCommentsData?>?) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = MaterialTheme.spacing.extraSmall, vertical = MaterialTheme.spacing.small),
+                    .padding(
+                        horizontal = MaterialTheme.spacing.extraSmall,
+                        vertical = MaterialTheme.spacing.small
+                    ),
                 verticalAlignment = Alignment.Top
             ) {
                 Image(
@@ -316,7 +481,9 @@ fun ComposableAllComments(allCommentsData: List<AllCommentsData?>?) {
                     shape = RoundedCornerShape(MaterialTheme.spacing.small)
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.avgLessSmall),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.spacing.avgLessSmall),
                     ) {
                         Row(
                             modifier = Modifier
@@ -372,5 +539,4 @@ fun ComposableAllComments(allCommentsData: List<AllCommentsData?>?) {
 
 @Preview
 @Composable
-fun CommentsScreenPreview() {
-}
+fun CommentsScreenPreview() {}

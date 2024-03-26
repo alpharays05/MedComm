@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.common.share_app.ShareAppsBottomSheet
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary400
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary700
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.fontSize
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.size
@@ -127,7 +128,7 @@ fun CustomTopAppBar(
 //                onClick = { initiateShare = true }
 //            )
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+        colors = TopAppBarDefaults.topAppBarColors(Primary400)
     )
 
     if (initiateShare) {

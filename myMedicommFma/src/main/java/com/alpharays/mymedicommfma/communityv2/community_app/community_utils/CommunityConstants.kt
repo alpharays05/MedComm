@@ -14,7 +14,7 @@ object CommunityConstants {
     const val GET_ALL_CHATS = "/chats/getallchats"
 
     // navigation routes
-    const val COMMUNITY_SCREEN_ROUTE = "community_screen_route"
+    const val COMMUNITY_SCREEN_ROUTE = "community_screen"
     const val GLOBAL_COMMUNITY_SEARCH_SCREEN_ROUTE = "global_community_screen_route"
     const val DIRECT_MESSAGE_SCREEN_ROUTE = "direct_message_screen_route"
     const val MESSAGE_INBOX_SCREEN_ROUTE = "message_inbox_screen_route"

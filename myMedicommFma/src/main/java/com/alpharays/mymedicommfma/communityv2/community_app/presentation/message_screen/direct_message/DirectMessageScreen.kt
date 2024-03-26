@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -97,6 +99,7 @@ fun ComposableDirectMessageScreen(
     directMessageViewModel: DirectMessageViewModel,
 ) {
     Scaffold(
+        modifier = Modifier.navigationBarsPadding(),
         topBar = {
             ComposableUserTopBar(navController)
         },
@@ -393,8 +396,10 @@ fun ComposableUserBottomBar(
             BasicTextField(
                 modifier = Modifier
                     .weight(1f)
+                    .imePadding()
                     .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
                     .padding(15.dp)
+
                     .clickable {
                         isAttachmentsVisible = false
                     },

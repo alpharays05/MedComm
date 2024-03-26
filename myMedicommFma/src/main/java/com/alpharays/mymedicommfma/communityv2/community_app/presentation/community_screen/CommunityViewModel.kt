@@ -29,20 +29,14 @@ class CommunityViewModel @Inject constructor(
     private val communityUseCase: CommunityUseCase,
 ) : ViewModel() {
     private val _allCommunityPostsStateFlow = MutableStateFlow(CommunityAllPostsState())
-    val allCommunityPostsStateFlow: StateFlow<CommunityAllPostsState> =
-        _allCommunityPostsStateFlow.asStateFlow()
+    val allCommunityPostsStateFlow: StateFlow<CommunityAllPostsState> = _allCommunityPostsStateFlow.asStateFlow()
 
     private val _addNewCommunityPostStateFlow = MutableStateFlow(NewPostResponseState())
-    val addNewCommunityPostStateFlow: StateFlow<NewPostResponseState> =
-        _addNewCommunityPostStateFlow.asStateFlow()
-
-    private val _allCachedCommunityPosts = MutableStateFlow(CommunityAllPostsState())
-    val allCachedCommunityPosts: StateFlow<CommunityAllPostsState> =
-        _allCachedCommunityPosts.asStateFlow()
+    val addNewCommunityPostStateFlow: StateFlow<NewPostResponseState> = _addNewCommunityPostStateFlow.asStateFlow()
 
     private var token = ""
 
-    private val _networkStatus = MutableStateFlow<ConnectivityObserver.Status>(ConnectivityObserver.Status.Unavailable)
+    private val _networkStatus = MutableStateFlow(ConnectivityObserver.Status.Unavailable)
     val networkStatus: StateFlow<ConnectivityObserver.Status> = _networkStatus.asStateFlow()
 
     private val _refreshing = MutableStateFlow(false)
@@ -52,12 +46,14 @@ class CommunityViewModel @Inject constructor(
         // token may not change during a session (login-logout) - so using init{} else could have used : get()
         token = CommunityUtils.getAuthToken(context)
         observeNetworkConnectivity()
-        getAllCommunityPosts()
     }
 
     private fun observeNetworkConnectivity() {
         viewModelScope.launch {
             networkObserver.observe().collect { status ->
+                if(_networkStatus.value != ConnectivityObserver.Status.Available && status == ConnectivityObserver.Status.Available){
+                    getAllCommunityPosts()
+                }
                 _networkStatus.value = status
             }
         }
@@ -70,6 +66,7 @@ class CommunityViewModel @Inject constructor(
     }
 
     private fun getAllCommunityPosts() {
+        println("calling_all_community_posts")
         communityUseCase(token).onEach { result ->
             when (result) {
                 is ResponseResult.Loading -> {
@@ -111,16 +108,6 @@ class CommunityViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
-    }
-
-
-    //  ************   room db - cached data   ************
-    private fun setAllCachedPosts() {
-
-    }
-
-    private fun getAllCachedPosts() {
-
     }
 }
 

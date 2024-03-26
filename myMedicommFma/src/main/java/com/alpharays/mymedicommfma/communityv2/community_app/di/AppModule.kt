@@ -10,8 +10,10 @@ import com.alpharays.mymedicommfma.communityv2.MedCommRouter.BASE_URL
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.SHARED_PREFERENCE_NAME
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.remote.CommunityApiServices
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.CommunityRepositoryImpl
+import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.DatastoreRepositoryImpl
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.SocketIOImpl
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.CommunityRepository
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.DatastoreRepository
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.SocketIO
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.repository.MessagesRepository
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.repository.MessagesRepositoryImpl
@@ -101,6 +103,12 @@ object AppModule {
     @Singleton
     fun provideNetworkConnectivityObserver(@ApplicationContext context: Context): NetworkConnectivityObserver {
         return NetworkConnectivityObserver(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDatastore(@ApplicationContext context: Context): DatastoreRepository {
+        return DatastoreRepositoryImpl(context)
     }
 
     @Provides

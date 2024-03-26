@@ -1,7 +1,14 @@
 package com.alpharays.mymedicommfma.communityv2.navigation
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,6 +21,7 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.common
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.AddNewCommunityPostScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.CommunityFullPostScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.CommunityScreen
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.PostSharedViewModel
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.message_screen.direct_message.DirectMessageScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.message_screen.message_inbox.MessageInboxScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
@@ -47,15 +55,16 @@ class CommunityFeatureImpl : CommunityFeatureApi {
             }
 
             composable(
-                route = CommunityAppScreens.CommunityPostScreen.route + "/{currentPostId}",
+                route = CommunityAppScreens.CommunityFullPostScreen.route + "/{currentPostId}",
                 arguments = listOf(
                     navArgument("currentPostId") {
                         type = NavType.StringType
                     }
                 )
-            ) {
+            ) { entry ->
+                // for getting all comments
                 val context = LocalContext.current
-                val postId = it.arguments?.getString("currentPostId") ?: ""
+                val postId = entry.arguments?.getString("currentPostId") ?: ""
                 CommunityUtils.setOneTimePostId(context, postId)
                 CommunityFullPostScreen(navController = navController)
             }
@@ -71,5 +80,13 @@ class CommunityFeatureImpl : CommunityFeatureApi {
 
         }
     }
+}
 
+@Composable
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavHostController): T {
+    val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
+    val parentEntry = remember(this) {
+        navController.getBackStackEntry(navGraphRoute)
+    }
+    return hiltViewModel(parentEntry)
 }

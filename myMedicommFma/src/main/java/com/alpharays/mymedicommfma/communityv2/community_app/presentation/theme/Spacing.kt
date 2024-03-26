@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 data class Spacing(
     val default: Dp = 0.dp,
     /**2.dp**/
+    val oneDp : Dp = 1.dp,
     val smallest: Dp = 2.dp,
     val avgExtraSmall: Dp = 3.dp,
     val extraSmall: Dp = 4.dp,

@@ -55,7 +55,6 @@ class CurrPostDetailViewModel @Inject constructor(
     }
 }
 
-
 data class AllCommentsState(
     var isLoading: Boolean? = false,
     var allComments: List<AllCommentsData?>? = null,

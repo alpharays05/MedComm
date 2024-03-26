@@ -12,7 +12,7 @@ sealed class CommunityAppScreens(val route: String) {
      data object CommunityScreen : CommunityAppScreens(COMMUNITY_SCREEN_ROUTE)
      data object GlobalCommunitySearch : CommunityAppScreens(GLOBAL_COMMUNITY_SEARCH_SCREEN_ROUTE)
      data object AddNewCommunityPostScreen : CommunityAppScreens(ADD_NEW_POST_SCREEN_ROUTE)
-     data object CommunityPostScreen : CommunityAppScreens(COMMENTS_SCREEN_ROUTE)
+     data object CommunityFullPostScreen : CommunityAppScreens(COMMENTS_SCREEN_ROUTE)
      data object DirectMessageScreen : CommunityAppScreens(DIRECT_MESSAGE_SCREEN_ROUTE)
      data object MessageInboxScreen : CommunityAppScreens(MESSAGE_INBOX_SCREEN_ROUTE)
 }

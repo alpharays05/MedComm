@@ -43,7 +43,13 @@ object MedCommRouter {
     const val NO_CONNECTION_MSG = "Check your connection, then refresh the page."
     const val INTERNAL_SERVER_ERROR = "internal server error"
     const val NO_CONNECTION = "No connection"
+    const val CURRENT_POST_ID = "CURRENT_POST_ID"
+    const val READ_FULL_POST: String = " ...Read more"
+    const val READ_MORE_BODY_TAG: String = "READ_MORE_BODY_TAG"
+    const val EMPTY: String = ""
     const val MEDICO_DATABASE = "medico_database"
+
+    const val DEFAULT_POST_BODY_LIMIT: Int = 50
 
     const val TOKEN_KEYWORD = "token"
     const val DOC_ID_KEYWORD = "docId"

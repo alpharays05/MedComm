@@ -29,6 +29,7 @@ import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.NO_CONNECTION
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.ONE_TIME_POST_ID_KEY
 import com.alpharays.mymedicommfma.communityv2.MedCommToast
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.CommunityViewModel
 
@@ -55,7 +56,7 @@ class CommunityUtils {
                 MedCommRouter.ONE_TIME_POST_ID,
                 Context.MODE_PRIVATE
             )
-            postIdSharedPref.edit().putString(MedCommRouter.ONE_TIME_POST_ID_KEY, postId).apply()
+            postIdSharedPref.edit().putString(ONE_TIME_POST_ID_KEY, postId).apply()
         }
 
         fun getOneTimePostId(context: Context): String {
@@ -63,7 +64,7 @@ class CommunityUtils {
                 MedCommRouter.ONE_TIME_POST_ID,
                 Context.MODE_PRIVATE
             )
-            return postIdSharedPref.getString(MedCommRouter.ONE_TIME_POST_ID_KEY, "").toString()
+            return postIdSharedPref.getString(ONE_TIME_POST_ID_KEY, "").toString()
         }
 
         @Composable

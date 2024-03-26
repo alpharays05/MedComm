@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -70,10 +72,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
 import com.alpharays.mymedicommfma.communityv2.MedCommToast
+import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.COMMUNITY_SCREEN_ROUTE
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.newpost.AddNewCommunityPost
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.BluishGray
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.FocusedTextColor
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary200
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary400
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.manRopeFontFamily
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.size
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.spacing
@@ -92,7 +96,7 @@ fun AddNewCommunityPostScreen(
     val height = LocalConfiguration.current.screenHeightDp.dp / 2
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.navigationBarsPadding().fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f),
         topBar = {
             ComposableNewPostTopBar(
@@ -114,7 +118,10 @@ fun AddNewCommunityPostScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .padding(
+                    horizontal = MaterialTheme.spacing.medium,
+                    vertical = MaterialTheme.spacing.avgSmall
+                )
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(2) {
@@ -141,7 +148,6 @@ fun AddNewCommunityPostScreen(
         }
     }
 }
-
 
 @Composable
 fun ComposablePostOutlinedTextField(
@@ -174,7 +180,8 @@ fun ComposablePostOutlinedTextField(
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = MaterialTheme.spacing.small),
+            .padding(vertical = MaterialTheme.spacing.small)
+            .imePadding(),
         value = postInputField,
         onValueChange = { newText ->
             postInputField = newText
@@ -199,7 +206,6 @@ fun ComposablePostOutlinedTextField(
     )
 }
 
-
 @Composable
 fun ComposableNewPostTopBar(
     navController: NavController,
@@ -223,14 +229,14 @@ fun ComposableNewPostTopBar(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary),
+        colors = CardDefaults.cardColors(Primary400),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(MaterialTheme.spacing.default)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(MaterialTheme.spacing.small),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -238,7 +244,7 @@ fun ComposableNewPostTopBar(
                     .padding(MaterialTheme.spacing.small)
                     .size(MaterialTheme.size.defaultIconSize)
                     .clickable {
-                        navController.navigate("community_screen") {
+                        navController.navigate(COMMUNITY_SCREEN_ROUTE) {
                             popUpTo(0)
                         }
                     },
@@ -296,21 +302,26 @@ fun ComposableNewPostTopBar(
         if (isSuccess == 1 && !postCreated) {
             postCreated = true
             MedCommToast.showToast(context, "Post created successfully")
-            navController.navigate("community_screen") {
+            navController.navigate(COMMUNITY_SCREEN_ROUTE) {
                 popUpTo(0)
             }
         }
     }
 }
 
-
 @Composable
 fun ComposableNewPostBottomBar(postImageSelected: (Bitmap) -> Unit) {
     var isExpandedMoreOptions by remember { mutableStateOf(false) }
     val interactionSource by remember { mutableStateOf(MutableInteractionSource()) }
+    val shape = RoundedCornerShape(
+        topStart = MaterialTheme.spacing.medium,
+        topEnd = MaterialTheme.spacing.medium,
+        bottomEnd = MaterialTheme.spacing.default,
+        bottomStart = MaterialTheme.spacing.default
+    )
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp, 18.dp, MaterialTheme.spacing.default, MaterialTheme.spacing.default),
+        shape = shape,
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         colors = CardDefaults.cardColors(Primary200)
     ) {
@@ -330,15 +341,17 @@ fun ComposableNewPostBottomBar(postImageSelected: (Bitmap) -> Unit) {
 
                 Icon(
                     modifier = Modifier
-                        .padding(start = 10.dp, end = 5.dp)
-                        .size(30.dp)
+                        .padding(
+                            start = MaterialTheme.spacing.avgSmall,
+                            end = MaterialTheme.spacing.lessSmall
+                        )
+                        .size(MaterialTheme.size.mediumIconSize2)
                         .rotate(if (!isExpandedMoreOptions) 180f else 0f)
                         .clickable(
                             indication = null,
-                            interactionSource = interactionSource
-                        ) {
-                            isExpandedMoreOptions = !isExpandedMoreOptions
-                        },
+                            interactionSource = interactionSource,
+                            onClick = { isExpandedMoreOptions = !isExpandedMoreOptions }
+                        ),
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = "close more options",
                     tint = BluishGray
@@ -377,9 +390,9 @@ fun ComposableNewPostBottomBar(postImageSelected: (Bitmap) -> Unit) {
                     )
                     ComposableNewPostExpandedOptions(
                         Modifier.padding(
-                            start = 12.dp,
-                            end = 12.dp,
-                            bottom = 10.dp
+                            start = MaterialTheme.spacing.medSmall,
+                            end = MaterialTheme.spacing.medSmall,
+                            bottom = MaterialTheme.spacing.avgSmall,
                         )
                     )
                 }
@@ -387,7 +400,6 @@ fun ComposableNewPostBottomBar(postImageSelected: (Bitmap) -> Unit) {
         }
     }
 }
-
 
 @Composable
 fun SelectPostImageOptions(onImageSelected: (Bitmap) -> Unit) {
@@ -590,7 +602,6 @@ fun ComposableNewPostMediaColumn(
     }
 }
 
-
 @Composable
 fun ComposableNewPostExpandedOptions(modifier: Modifier) {
     var checked by remember { mutableStateOf(true) }
@@ -604,7 +615,7 @@ fun ComposableNewPostExpandedOptions(modifier: Modifier) {
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 15.dp, start = 10.dp, end = 10.dp),
+                .padding(top = 15.dp, start = 10.dp, end = 10.dp), // TODO: add Material theme
             text = "Comment",
             style = style
         )
@@ -616,20 +627,18 @@ fun ComposableNewPostExpandedOptions(modifier: Modifier) {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 5.dp, start = 10.dp, end = 14.dp)
+                    .padding(top = 5.dp, start = 10.dp, end = 14.dp) // TODO: add Material theme
                     .weight(1f),
                 text = "Enabling comment will allow others to comment on your post",
                 style = TextStyle(
-                    fontSize = 14.sp,
+                    fontSize = 14.sp, // TODO: add Material theme
                     fontWeight = FontWeight.Normal
                 )
             )
 
             Switch(
                 checked = checked,
-                onCheckedChange = {
-                    checked = it
-                },
+                onCheckedChange = { checked = it },
                 thumbContent = if (checked) {
                     {
                         Icon(
@@ -652,7 +661,6 @@ fun ComposableNewPostExpandedOptions(modifier: Modifier) {
         }
     }
 }
-
 
 @Preview
 @Composable

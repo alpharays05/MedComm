@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.COMMUNITY_SCREEN_ROUTE
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.BluishGray
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary200
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.fontSize
@@ -250,7 +252,7 @@ fun GlobalSearchBox(navController: NavController) {
                 Icon(
                     modifier = Modifier
                         .clickable {
-                            navController.navigate("community_screen") {
+                            navController.navigate(COMMUNITY_SCREEN_ROUTE) {
                                 popUpTo(0)
                             }
                         }
@@ -277,6 +279,7 @@ fun GlobalSearchBox(navController: NavController) {
                 BasicTextField(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .onFocusChanged {
                             searchBarActive = it.hasFocus
                         },

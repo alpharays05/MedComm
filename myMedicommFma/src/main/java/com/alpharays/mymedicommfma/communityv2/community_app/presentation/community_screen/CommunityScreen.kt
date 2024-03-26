@@ -1,14 +1,17 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen
 
-
 import android.content.Context
+import android.view.MotionEvent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
@@ -23,11 +26,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
@@ -59,6 +68,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
@@ -66,17 +76,22 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -88,7 +103,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.common.connectivity.ConnectivityObserver
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.DEFAULT_POST_BODY_LIMIT
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.EMPTY
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.NO_CONNECTION
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.READ_FULL_POST
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.READ_MORE_BODY_TAG
 import com.alpharays.mymedicommfma.communityv2.MedCommToast
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.CAN_NOT_COMMENT_NO_CONNECTION
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.CAN_NOT_REACT_NO_CONNECTION
@@ -113,6 +132,7 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.OnSurfaceHighEmphasis
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary100
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary500
+import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.Primary600
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.manRopeFontFamily
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.size
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.spacing
@@ -124,7 +144,7 @@ import kotlinx.coroutines.delay
 fun CommunityScreen(
     navController: NavController,
     communityViewModel: CommunityViewModel = hiltViewModel(),
-    postSharedViewModel: PostSharedViewModel = hiltViewModel(),
+    postSharedViewModel: PostSharedViewModel = hiltViewModel()
 ) {
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val isInternetAvailable by communityViewModel.networkStatus.collectAsStateWithLifecycle()
@@ -136,9 +156,14 @@ fun CommunityScreen(
             if (isInternetAvailable != ConnectivityObserver.Status.Available) {
                 MedCommToast.showToast(context, NO_CONNECTION)
             }
-            communityViewModel.refreshCommunityPosts()
+            else{
+                communityViewModel.refreshCommunityPosts()
+            }
         }
     )
+
+    val allCommunityPostsResponse by communityViewModel.allCommunityPostsStateFlow.collectAsStateWithLifecycle()
+    val communityPostsList = allCommunityPostsResponse.allPosts?.communityPostData
 
     ModalNavigationDrawer(
         modifier = Modifier,
@@ -146,8 +171,8 @@ fun CommunityScreen(
         content = {
             Scaffold(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .pullRefresh(pullRefreshState),
+                    .navigationBarsPadding()
+                    .fillMaxSize(),
                 topBar = {
                     CustomTopAppBar(drawerState = drawerState, showLogo = true, navController = navController)
                 },
@@ -155,6 +180,7 @@ fun CommunityScreen(
             ) { innerPadding ->
                 Box(
                     modifier = Modifier
+                        .pullRefresh(pullRefreshState)
                         .padding(innerPadding)
                         .fillMaxSize()
                 ) {
@@ -162,7 +188,8 @@ fun CommunityScreen(
                         navController = navController,
                         isInternetAvailable = isInternetAvailable,
                         communityViewModel = communityViewModel,
-                        viewModel = postSharedViewModel
+                        viewModel = postSharedViewModel,
+                        communityPostsList = communityPostsList
                     )
                     PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
                 }
@@ -183,12 +210,11 @@ fun CommunityScreen(
 fun ComposableCommunityPosts(
     navController: NavController,
     isInternetAvailable: ConnectivityObserver.Status,
+    communityPostsList: List<CommunityPost>?,
     communityViewModel: CommunityViewModel,
     viewModel: PostSharedViewModel,
 ) {
     val context = LocalContext.current
-    val allCommunityPostsResponse by communityViewModel.allCommunityPostsStateFlow.collectAsStateWithLifecycle()
-    val communityPostsList = allCommunityPostsResponse.allPosts?.communityPostData
     var showAddNewAppointmentIcon by remember { mutableStateOf(true) }
 
     val scope = rememberCoroutineScope()
@@ -218,7 +244,11 @@ fun ComposableCommunityPosts(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = MaterialTheme.spacing.extraSmall)
-                                .border(1.dp, cardBorderBrush, RoundedCornerShape(MaterialTheme.size.small)),
+                                .border(
+                                    1.dp,
+                                    cardBorderBrush,
+                                    RoundedCornerShape(MaterialTheme.size.small)
+                                ),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f)),
                             shape = RoundedCornerShape(MaterialTheme.size.small)
                         ) {
@@ -227,7 +257,7 @@ fun ComposableCommunityPosts(
                                 verticalArrangement = Arrangement.SpaceBetween,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                ComposableCommunityPostUpperRow(context, post)
+                                ComposableCommunityPostUpperRow(context = context, post = post)
 
                                 ComposableCommunityPostContent(
                                     context = context,
@@ -237,11 +267,13 @@ fun ComposableCommunityPosts(
                                     isInternetAvailable = isInternetAvailable
                                 )
 
-                                ComposableCommunityPostLowerRow(context, post)
+                                ComposableCommunityPostLowerRow(context = context, post = post)
 
-                                ComposableCommunityPostLastRow(context, isInternetAvailable) {
-                                    showAddNewAppointmentIcon = !it
-                                }
+                                ComposableCommunityPostLastRow(
+                                    context = context,
+                                    isInternetAvailable = isInternetAvailable,
+                                    onBottomBarStatusChange = { showAddNewAppointmentIcon = !it }
+                                )
                             }
                         }
 
@@ -270,25 +302,30 @@ fun ComposableCommunityPosts(
             ComposableNoNetworkFound(
                 context = context,
                 networkStatus = isInternetAvailable,
-                modifier = Modifier.padding(top = 15.dp),
+                modifier = Modifier,
                 viewModel = communityViewModel
             )
         }
 
         AnimatedVisibility(visible = isInternetAvailable == ConnectivityObserver.Status.Lost) {
             LaunchedEffect(Unit) {
-                MedCommToast.showToast(context, "No Connection")
+                MedCommToast.showToast(context, NO_CONNECTION)
             }
         }
 
         AnimatedVisibility(
             visible = showAddNewAppointmentIcon,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
         ) {
             Icon(
                 modifier = Modifier
                     .size(MaterialTheme.size.large3)
-                    .background(Primary100.copy(alpha = .5f), RoundedCornerShape(MaterialTheme.spacing.medSmall))
+                    .background(
+                        Primary100.copy(alpha = .5f),
+                        RoundedCornerShape(MaterialTheme.spacing.medSmall)
+                    )
                     .clip(RoundedCornerShape(MaterialTheme.spacing.medSmall))
                     .border(0.5.dp, Color.Black, RoundedCornerShape(MaterialTheme.spacing.medSmall))
                     .clickable {
@@ -322,13 +359,13 @@ fun ComposableCommunityPostUpperRow(context: Context, post: CommunityPost) {
     )
     Row(
         verticalAlignment = Alignment.Top,
-        modifier = Modifier.padding(vertical = 5.dp, horizontal = 5.dp)
+        modifier = Modifier.padding(MaterialTheme.spacing.lessSmall)
     ) {
         Image(
             modifier = Modifier
-                .border(1.dp, Color.Gray, RoundedCornerShape(40.dp))
-                .size(45.dp)
-                .clip(RoundedCornerShape(40.dp)),
+                .border(1.dp, Color.Gray, RoundedCornerShape(MaterialTheme.size.large3))
+                .size(MaterialTheme.size.large3)
+                .clip(RoundedCornerShape(MaterialTheme.size.large3)),
             painter = painterResource(id = R.drawable.doctor_profile),
             contentDescription = "doctor avatar"
         )
@@ -336,17 +373,20 @@ fun ComposableCommunityPostUpperRow(context: Context, post: CommunityPost) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 10.dp, end = 5.dp),
+                .padding(
+                    start = MaterialTheme.spacing.avgSmall,
+                    end = MaterialTheme.spacing.lessSmall
+                ),
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.padding(MaterialTheme.spacing.extraSmall),
                 text = post.posterName ?: "--",
                 style = style1
             )
 
             Text(
-                modifier = Modifier.padding(start = 4.dp),
+                modifier = Modifier.padding(start = MaterialTheme.spacing.extraSmall),
                 text = post.aboutDoc ?: "--",
                 maxLines = 1,
                 style = style2
@@ -361,8 +401,8 @@ fun ComposableCommunityPostUpperRow(context: Context, post: CommunityPost) {
         ) {
             Icon(
                 modifier = Modifier
-                    .padding(end = 5.dp)
-                    .size(20.dp),
+                    .padding(end = MaterialTheme.spacing.lessSmall)
+                    .size(MaterialTheme.size.smallIconSize),
                 imageVector = Icons.Default.PersonAdd,
                 contentDescription = "connect",
                 tint = Color.Blue.copy(alpha = .8f)
@@ -394,44 +434,74 @@ fun ComposableCommunityPostContent(
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
         textAlign = TextAlign.Start
     )
-    val style2 = TextStyle(
+    val bodySpanStyle = SpanStyle(
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
         fontFamily = manRopeFontFamily,
-        fontWeight = FontWeight.W300,
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
-        textAlign = TextAlign.Start
+        fontWeight = FontWeight.W400,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
     )
+
+    val annotationSpanStyle = SpanStyle(
+        color = Primary600,
+        fontWeight = FontWeight.Medium,
+        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+        fontFamily = manRopeFontFamily
+    )
+
+    val lengthCondition = (post.postContent?.length ?: 0) > DEFAULT_POST_BODY_LIMIT
+    var showFullPost by remember { mutableStateOf(!lengthCondition) }
+    var readMore by remember {
+        mutableStateOf(if (lengthCondition) READ_FULL_POST else EMPTY)
+    }
+    val string = if (showFullPost) post.postContent else post.postContent?.take(70)
+    val annotatedText = buildAnnotatedString {
+        withStyle(style = bodySpanStyle) {
+            append(string)
+        }
+        pushStringAnnotation(tag = READ_MORE_BODY_TAG, annotation = READ_MORE_BODY_TAG)
+        withStyle(style = annotationSpanStyle) {
+            append(readMore)
+        }
+        pop()
+    }
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp, horizontal = 4.dp)
-            .clip(RoundedCornerShape(MaterialTheme.spacing.lessSmall))
             .clickable(
                 interactionSource = interactionSource,
-                indication = LocalIndication.current
+                indication = null
             ) {
                 if (isInternetAvailable == ConnectivityObserver.Status.Available) {
-                    viewModel.clearPostContentState()
-                    viewModel.setOrUpdate(post)
-                    navController?.navigate(CommunityAppScreens.CommunityPostScreen.route + "/$currentPostId")
+                    viewModel.removeAllPosts()
+                    viewModel.setCurrentPostState(post) // stored current clicked post in datastore
+                    navController?.navigate(CommunityAppScreens.CommunityFullPostScreen.route + "/$currentPostId")
                 } else {
                     MedCommToast.showToast(context, NO_CONNECTION)
                 }
-            },
+            }
+            .fillMaxWidth()
+            .padding(
+                vertical = MaterialTheme.spacing.avgSmall,
+                horizontal = MaterialTheme.spacing.extraSmall
+            )
+            .clip(RoundedCornerShape(MaterialTheme.spacing.lessSmall)),
         colors = CardDefaults.cardColors(containerColor = Primary500.copy(alpha = .1f)),
-        shape = RoundedCornerShape(5.dp)
+        shape = RoundedCornerShape(MaterialTheme.spacing.lessSmall)
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
+        Column(modifier = Modifier.padding(MaterialTheme.spacing.avgSmall)) {
             Text(
                 text = post.postTitle ?: "--",
                 style = style1
             )
 
-            Text(
-                modifier = Modifier.padding(top = 15.dp),
-                text = post.postContent ?: "--", // TODO: take upto 15-20 characters of post content, rest show on "Read More" clickable annotated string
-                style = style2
+            // TODO: clickable text touch input is getting interfered with Card touch input
+            ClickableText(
+                modifier = Modifier.padding(top = MaterialTheme.spacing.medium),
+                text = annotatedText,
+                onClick = { _ ->
+                    showFullPost = true
+                    readMore = ""
+                }
             )
         }
     }
@@ -460,7 +530,7 @@ fun ComposableCommunityPostLowerRow(context: Context, post: CommunityPost) {
     val indication = LocalIndication.current
 
     Row(
-        modifier = Modifier.padding(vertical = 12.dp, horizontal = 5.dp),
+        modifier = Modifier.padding(vertical = MaterialTheme.spacing.medSmall, horizontal = MaterialTheme.spacing.lessSmall),
         verticalAlignment = Alignment.Top
     ) {
         Text(text = "$reactionsCount Reactions", style = style)
@@ -480,11 +550,8 @@ fun ComposableCommunityPostLastRow(
     showCommentsAgain: Boolean = true,
     onBottomBarStatusChange: (Boolean) -> Unit,
 ) {
-    var postLiked by remember { mutableStateOf(false) }
+//    var postLiked by remember { mutableStateOf(false) }
     var likePainterId by remember { mutableIntStateOf(R.drawable.not_liked) }
-    LaunchedEffect(postLiked) {
-        likePainterId = if (postLiked) R.drawable.like_reaction else R.drawable.not_liked
-    }
     val likePainter = painterResource(id = likePainterId)
     val commentPainter = painterResource(id = R.drawable.comment)
     val repostPainter = painterResource(id = R.drawable.repost)
@@ -494,9 +561,6 @@ fun ComposableCommunityPostLastRow(
     var isCommentsVisible by remember { mutableStateOf(false) }
     var itemHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
-    val focusRequester = remember { FocusRequester() }
-//    val interactionSource = remember { MutableInteractionSource() }
-//    val indication = rememberRipple(color = Color.LightGray)
     val style = TextStyle(
         fontSize = MaterialTheme.typography.bodySmall.fontSize,
         fontFamily = workSansFontFamily,
@@ -504,6 +568,12 @@ fun ComposableCommunityPostLastRow(
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
         textAlign = TextAlign.Start
     )
+
+    val reactionsLazyList : ArrayList<CommunityPostReactions> = ArrayList()
+    reactionsLazyList.add(CommunityPostReactions(likePainter, LIKE_PAINTER_CONTENT_DSC, LIKE_OPTION, style, ReactionOptions.LIKE))
+    reactionsLazyList.add(CommunityPostReactions(commentPainter, COMMENT_PAINTER_CONTENT_DSC, COMMENT_OPTION, style, ReactionOptions.COMMENT))
+    reactionsLazyList.add(CommunityPostReactions(repostPainter, REPOST_PAINTER_CONTENT_DSC, REPOST_OPTION, style, ReactionOptions.REPOST))
+    reactionsLazyList.add(CommunityPostReactions(sendPainter, SEND_PAINTER_CONTENT_DSC, SEND_OPTION, style, ReactionOptions.SEND))
 
     Column(
         modifier = Modifier
@@ -517,75 +587,67 @@ fun ComposableCommunityPostLastRow(
             modifier = Modifier.padding(start = MaterialTheme.spacing.small, end = MaterialTheme.spacing.small, bottom = MaterialTheme.spacing.extraSmall),
             color = MaterialTheme.colorScheme.surface.copy(alpha = .08f)
         )
-        Row(
+        LazyRow(
             modifier = Modifier
                 .padding(bottom = MaterialTheme.spacing.extraSmall)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceAround, // TODO: icons not getting at the end - (SpaceAround) not working
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CommunityPostReactionOptions(
-                style = style.copy(fontWeight = if(postLiked) FontWeight.Bold else style.fontWeight),
-                context = context,
-                painter = likePainter,
-                contentDescription = LIKE_PAINTER_CONTENT_DSC,
-                imageText = LIKE_OPTION,
-                onSingleTap = { offSet ->
-                    if (isInternetAvailable == ConnectivityObserver.Status.Available) {
-                        postLiked = !postLiked
-                    } else {
-                        MedCommToast.showToast(context, CAN_NOT_REACT_NO_CONNECTION)
-                    }
-                },
-                onLongPress = { offSet ->
-                    isReactionsVisible = true
-                    pressOffset = IntOffset(offSet.x.toInt(), offSet.y.toInt())
-                }
-            )
-            CommunityPostReactionOptions(
-                context = context,
-                painter = commentPainter,
-                contentDescription = COMMENT_PAINTER_CONTENT_DSC,
-                imageText = COMMENT_OPTION,
-                style = style,
-                onSingleTap = {
-                    if (isInternetAvailable == ConnectivityObserver.Status.Available) {
-                        if (showCommentsAgain) {
-                            isCommentsVisible = !isCommentsVisible
+            items(reactionsLazyList){ item ->
+                CommunityPostReactionOptions(
+                    modifier = Modifier.weight(1f),
+                    style = item.style.copy(fontWeight = if(likePainterId == R.drawable.like_reaction && item.reactionOptions == ReactionOptions.LIKE) FontWeight.Bold else style.fontWeight),
+                    painter = if(item.reactionOptions == ReactionOptions.LIKE) likePainter else item.painter,
+                    contentDescription = item.cd,
+                    imageText = item.imageText,
+                    onSingleTap = { offSet ->
+                        when(item.reactionOptions){
+                            ReactionOptions.LIKE -> {
+                                if (isInternetAvailable == ConnectivityObserver.Status.Available) {
+                                    val prevLikePainterId = R.drawable.not_liked
+                                    likePainterId = if(likePainterId == prevLikePainterId){
+                                        R.drawable.like_reaction
+                                    } else{
+                                        R.drawable.not_liked
+                                    }
+                                } else {
+                                    MedCommToast.showToast(context, CAN_NOT_REACT_NO_CONNECTION)
+                                }
+                            }
+                            ReactionOptions.COMMENT -> {
+                                if (isInternetAvailable == ConnectivityObserver.Status.Available) {
+                                    if (showCommentsAgain) {
+                                        isCommentsVisible = !isCommentsVisible
+                                    }
+                                } else {
+                                    MedCommToast.showToast(context, CAN_NOT_COMMENT_NO_CONNECTION)
+                                }
+                            }
+                            ReactionOptions.REPOST -> {
+                                if (isInternetAvailable == ConnectivityObserver.Status.Available) {
+                                    // TODO:
+                                } else {
+                                    MedCommToast.showToast(context, CAN_NOT_REPOST_NO_CONNECTION)
+                                }
+                            }
+                            ReactionOptions.SEND -> {
+                                if (isInternetAvailable == ConnectivityObserver.Status.Available) {
+                                    // TODO:
+                                } else {
+                                    MedCommToast.showToast(context, CAN_NOT_SEND_NO_CONNECTION)
+                                }
+                            }
                         }
-                    } else {
-                        MedCommToast.showToast(context, CAN_NOT_COMMENT_NO_CONNECTION)
+                    },
+                    onLongPress = { offSet ->
+                        if(item.reactionOptions == ReactionOptions.LIKE){
+                            isReactionsVisible = true
+                            pressOffset = IntOffset(offSet.x.toInt(), offSet.y.toInt())
+                        }
                     }
-                }
-            )
-            CommunityPostReactionOptions(
-                context = context,
-                painter = repostPainter,
-                contentDescription = REPOST_PAINTER_CONTENT_DSC,
-                imageText = REPOST_OPTION,
-                style = style,
-                onSingleTap = {
-                    if (isInternetAvailable == ConnectivityObserver.Status.Available) {
-                        // TODO:
-                    } else {
-                        MedCommToast.showToast(context, CAN_NOT_REPOST_NO_CONNECTION)
-                    }
-                }
-            )
-            CommunityPostReactionOptions(
-                context = context,
-                painter = sendPainter,
-                contentDescription = SEND_PAINTER_CONTENT_DSC,
-                imageText = SEND_OPTION,
-                style = style,
-                onSingleTap = {
-                    if (isInternetAvailable == ConnectivityObserver.Status.Available) {
-                        // TODO:
-                    } else {
-                        MedCommToast.showToast(context, CAN_NOT_SEND_NO_CONNECTION)
-                    }
-                }
-            )
+                )
+            }
         }
         AnimatedVisibility(visible = isCommentsVisible && showCommentsAgain) {
             HorizontalDivider(
@@ -599,15 +661,32 @@ fun ComposableCommunityPostLastRow(
     }
 
     AnimatedVisibility(visible = isReactionsVisible) {
-        ComposablePopReactionsRow(context, pressOffset, itemHeight, density) {
-            isReactionsVisible = false
-        }
+        ComposablePopReactionsRow(
+            context = context,
+            pressOffset = pressOffset,
+            itemHeight = itemHeight,
+            density = density,
+            onDismiss = { isReactionsVisible = false },
+            onReactionSelected = { likePainterId = it  }
+        )
     }
 }
 
+enum class ReactionOptions {
+    LIKE, COMMENT, REPOST, SEND
+}
+
+data class CommunityPostReactions(
+    val painter: Painter,
+    val cd: String,
+    val imageText: String,
+    val style: TextStyle,
+    val reactionOptions: ReactionOptions
+)
+
 @Composable
 fun CommunityPostReactionOptions(
-    context: Context,
+    modifier : Modifier,
     style: TextStyle,
     painter: Painter,
     contentDescription: String,
@@ -616,9 +695,12 @@ fun CommunityPostReactionOptions(
     onLongPress: (Offset) -> Unit = {},
 ) {
     Column(
-        modifier = Modifier
-            .padding(horizontal = 10.dp, vertical = 5.dp)
-            .pointerInput(true) {
+        modifier = modifier
+            .padding(
+                horizontal = MaterialTheme.spacing.medSmall,
+                vertical = MaterialTheme.spacing.lessSmall
+            )
+            .pointerInput(true) { // TODO: need to figure out what does key1 in pointerInput means?
                 detectTapGestures(
                     onLongPress = { offset ->
                         onLongPress(offset)
@@ -637,10 +719,7 @@ fun CommunityPostReactionOptions(
             painter = painter,
             contentDescription = contentDescription
         )
-        Text(
-            text = imageText,
-            style = style
-        )
+        Text(text = imageText, style = style)
     }
 }
 
@@ -689,6 +768,7 @@ fun ComposableExpandedComment(focusRequester: FocusRequester, onDismiss: () -> U
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .imePadding()
                     .focusRequester(focusRequester),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Transparent,
@@ -730,17 +810,17 @@ fun ComposablePopReactionsRow(
     pressOffset: IntOffset,
     itemHeight: Dp,
     density: Density,
+    onReactionSelected : (Int) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val reactionPainters = ReactionPainters.entries
-
-    val color = Color.White
     val borderColor = Color(0xFFCECECE)
-    val shape = RoundedCornerShape(8.dp)
-    val marginAboveIcon = 40.dp
+    val shape = RoundedCornerShape(MaterialTheme.spacing.small)
+    val marginAboveIcon = MaterialTheme.size.large2
     val itemHeightPx = with(density) { itemHeight.roundToPx() }
     val marginAboveIconPx = with(density) { marginAboveIcon.roundToPx() }
-    val yOffset = pressOffset.y + itemHeightPx + marginAboveIconPx
+    val yOffset = pressOffset.y + itemHeightPx //+ marginAboveIconPx
+    val cardBorderBrush = Brush.sweepGradient(colors = listOf(BluishGray, Color.Transparent, BluishGray, Color.Transparent))
 
     Popup(
         onDismissRequest = onDismiss,
@@ -752,51 +832,92 @@ fun ComposablePopReactionsRow(
             excludeFromSystemGesture = true
         ),
     ) {
-        Row(
+        Card(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(horizontal = MaterialTheme.spacing.small)
                 .fillMaxWidth()
-                .background(color, shape)
-                .border(1.dp, borderColor, shape)
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            reactionPainters.forEachIndexed { index, painterId ->
-                AnimatedVisibilityWithDelay(
-                    painterId = painterId.getReactionPainterId(),
-                    index = index,
-                    context = context
-                )
+                .padding(MaterialTheme.spacing.small),
+            elevation = CardDefaults.cardElevation(defaultElevation = MaterialTheme.spacing.extraSmall),
+            border = BorderStroke(MaterialTheme.spacing.oneDp, BluishGray.copy(alpha = .6f))
+        ){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 1f),
+                        RoundedCornerShape(MaterialTheme.spacing.small)
+                    )
+                    .padding(MaterialTheme.spacing.medSmall)
+                    .clip(RoundedCornerShape(MaterialTheme.spacing.small)),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                reactionPainters.forEachIndexed { index, painterId ->
+                    AnimatedVisibilityWithDelay(
+                        painterId = painterId.getReactionPainterId(),
+                        index = index,
+                        context = context,
+                        onComplete = {
+                            onReactionSelected(painterId.getReactionPainterId())
+                            onDismiss()
+                        }
+                    )
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun AnimatedVisibilityWithDelay(painterId: Int, index: Int, context: Context) {
-    // TODO: animated visibility with compose specific events - tweeen, expandH or expandV
+fun AnimatedVisibilityWithDelay(
+    painterId: Int,
+    index: Int,
+    context: Context,
+    onComplete: () -> Unit
+) {
     // Define animation specs for enter animation
     val enterAnimation = slideInHorizontally(initialOffsetX = { -20 }) + fadeIn()
     val exitAnimation = slideOutHorizontally(targetOffsetX = { -20 }) + fadeOut()
 
     // Use AnimatedVisibility for each image
-    var isVisible by remember { mutableStateOf(false) }
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(targetValue = if (isPressed) 1.5f else 1f)
 
     LaunchedEffect(key1 = Unit) {
-        delay(index * 5L) // Staggered delay, adjust the multiplier as needed
-        isVisible = true
+        delay(index * 3L) // Staggered delay, adjust the multiplier as needed
     }
 
     AnimatedVisibility(
-        visible = isVisible,
+        visible = true,
         enter = enterAnimation,
         exit = exitAnimation
     ) {
-        // Replace with your CommunityPostReactionImageUseCase composable
         Image(
             painter = painterResource(id = painterId),
-            contentDescription = null,
-            modifier = Modifier.size(25.dp)
+            modifier = Modifier
+                .wrapContentSize(unbounded = true)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                }
+                .size(MaterialTheme.size.mediumIconSize)
+                .animateContentSize() // Animate size changes
+                .pointerInteropFilter { motionEvent ->
+                    when (motionEvent.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            // User has started pressing
+                            isPressed = true
+                        }
+
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                            // User has stopped pressing
+                            isPressed = false
+                            onComplete()
+                        }
+                    }
+                    true
+                },
+            contentDescription = null
         )
     }
 }

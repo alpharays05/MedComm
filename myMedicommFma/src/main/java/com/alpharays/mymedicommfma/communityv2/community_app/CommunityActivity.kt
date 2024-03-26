@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import com.alpharays.mymedicommfma.communityv2.community_app.di.DependencyProvider
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.AppContent
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.CommunityTheme
@@ -20,6 +21,7 @@ class CommunityActivity : AppCompatActivity() {
         DependencyProvider.provideImpl(communityFeatureApi = CommunityFeatureImpl())
         setContent {
             CommunityTheme {
+                WindowCompat.setDecorFitsSystemWindows(window, true)
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

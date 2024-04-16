@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityPostDeserializer
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.CommunityPost
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.community_screen.all_comm_posts.CommunityPost
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.DatastoreRepository
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -21,7 +21,7 @@ private val Context.datastore: DataStore<Preferences> by preferencesDataStore("P
 class DatastoreRepositoryImpl @Inject constructor(
     private val context: Context,
 ) : DatastoreRepository {
-    private val communityPostKey = stringPreferencesKey("prob_alerts_preferences_key")
+    private val communityPostKey = stringPreferencesKey("community_post_datastore_key")
     private val gson = GsonBuilder()
         .registerTypeAdapter(CommunityPost::class.java, CommunityPostDeserializer())
         .create()
@@ -32,6 +32,7 @@ class DatastoreRepositoryImpl @Inject constructor(
     override suspend fun setCommunityPost(post: CommunityPost) {
         val json = gson.toJson(post)
         context.datastore.edit { preferences ->
+            preferences.clear()
             getCurrentPostStateFlow.value = post
             preferences[communityPostKey] = json
         }
@@ -61,7 +62,13 @@ class DatastoreRepositoryImpl @Inject constructor(
         }
 
     override suspend fun removeAllAlerts() {
-          // TODO("Not yet implemented")
+        try {
+            context.datastore.edit {
+                it.clear()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }

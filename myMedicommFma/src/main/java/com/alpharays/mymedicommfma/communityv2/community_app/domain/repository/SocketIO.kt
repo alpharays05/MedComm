@@ -1,7 +1,7 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.domain.repository
 
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.messages_screen.get_all_chats.MessageResponse
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.socketio.MessagesSocketState
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.DirectMessage
 import kotlinx.coroutines.flow.StateFlow
 
 interface SocketIO{
@@ -28,6 +28,6 @@ interface SocketIO{
     fun connectMessagesSocket()
     fun disconnectMessagesSocket()
 
-    fun emitDirectMessage(newMessageMap: Map<String, DirectMessage>)
+    fun emitDirectMessage(newMessageMap: Map<String, MessageResponse>)
 
 }

@@ -44,7 +44,7 @@ object MedCommRouter {
     const val INTERNAL_SERVER_ERROR = "internal server error"
     const val NO_CONNECTION = "No connection"
     const val CURRENT_POST_ID = "CURRENT_POST_ID"
-    const val READ_FULL_POST: String = " ...Read more"
+    const val READ_FULL_POST: String = " ... Read more"
     const val READ_MORE_BODY_TAG: String = "READ_MORE_BODY_TAG"
     const val EMPTY: String = ""
     const val MEDICO_DATABASE = "medico_database"
@@ -52,6 +52,8 @@ object MedCommRouter {
     const val DEFAULT_POST_BODY_LIMIT: Int = 50
 
     const val TOKEN_KEYWORD = "token"
+    const val SUCCESS_CODE = "1"
+    const val COMMENT_ADDED = "Comment added successfully"
     const val DOC_ID_KEYWORD = "docId"
     const val KEYBOARD_CLOSE_ON_BACK_PRESS_KEY_CODE = 17179869184
 

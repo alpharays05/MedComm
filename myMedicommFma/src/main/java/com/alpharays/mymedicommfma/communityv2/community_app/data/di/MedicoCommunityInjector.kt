@@ -6,12 +6,12 @@ import com.alpharays.mymedicommfma.communityv2.MedCommRouter.API_SAFE_KEY
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.API_SAFE_KEY_VALUE
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.BASE_URL
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.remote.CommunityApiServices
-import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.CommunityRepositoryImpl
+import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.CommunityApiImpl
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.SocketIOImpl
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.SocketIO
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.usecase.CommunityUseCase
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.repository.MessagesRepositoryImpl
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.usecase.MessagesUseCase
+import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.MessagesRepositoryImpl
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.usecase.MessagesUseCase
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -99,7 +99,7 @@ class MedicoCommunityInjector {
         if (!::communityUseCase.isInitialized) {
             val apiServices = getCommunityApiServices()
             val responseHandler = getResponseHandler()
-            val impl = CommunityRepositoryImpl(apiServices, responseHandler)
+            val impl = CommunityApiImpl(apiServices, responseHandler)
             communityUseCase = CommunityUseCase(impl)
         }
         return communityUseCase

@@ -53,6 +53,7 @@ data class FontSizes(
     val medSmall2: TextUnit = 14.sp,
     val medium: TextUnit = 16.sp,
     val medLarge: TextUnit = 18.sp,
+    val large: TextUnit = 20.sp,
     val minLetterSpacing: TextUnit = 0.6.sp
 )
 

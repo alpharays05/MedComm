@@ -1,7 +1,8 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.community_utils
 
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.CommunityPost
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.Reactions
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.community_screen.all_comm_posts.CommunityPost
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.community_screen.all_comm_posts.ReactionType
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.community_screen.all_comm_posts.Reactions
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -16,33 +17,34 @@ class CommunityPostDeserializer : JsonDeserializer<CommunityPost> {
     ): CommunityPost {
         val jsonObject = json.asJsonObject
 
-        val v = jsonObject.get("__v")?.asString
-        val id = jsonObject.get("_id")?.asString
+        val postId = jsonObject.get("postId")?.asString
         val aboutDoc = jsonObject.get("aboutDoc")?.asString
-        val avatar = jsonObject.get("avatar")?.asString
+        val doctorAvatar = jsonObject.get("doctorAvatar")?.asString
         val postContent = jsonObject.get("postContent")?.asString
         val postTitle = jsonObject.get("postTitle")?.asString
         val posterId = jsonObject.get("posterId")?.asString
         val posterName = jsonObject.get("posterName")?.asString
 
         val commentsType = object : TypeToken<List<String>>() {}.type
-        val comments = context.deserialize<List<String>>(jsonObject.get("comments"), commentsType)
+        val comments = context.deserialize<List<String>>(jsonObject.get("comments"), commentsType) ?: listOf()
 
         val reactionsType = object : TypeToken<Reactions>() {}.type
-        val reactions = context.deserialize<Reactions>(jsonObject.get("reactions"), reactionsType)
+        val reactions = context.deserialize<Reactions>(jsonObject.get("reactions"), reactionsType) ?: Reactions()
+
+        val myReactionType = object : TypeToken<ReactionType>() {}.type
+        val myReaction = context.deserialize<ReactionType>(jsonObject.get("myReaction"), myReactionType)
 
         return CommunityPost(
-            v = v,
-            id = id,
+            postId = postId,
             aboutDoc = aboutDoc,
-            avatar = avatar,
+            doctorAvatar = doctorAvatar,
             comments = comments,
             postContent = postContent,
             postTitle = postTitle,
             posterId = posterId,
             posterName = posterName,
-            reactions = reactions
+            reactions = reactions,
+            myReaction = myReaction
         )
     }
 }
-

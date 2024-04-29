@@ -1,6 +1,6 @@
 package com.alpharays.mymedicommfma.communityv2.community_app.data.source.remote
 
-import com.alpharays.mymedicommfma.communityv2.MedCommRouter
+import com.alpharays.mymedicommfma.communityv2.MedCommRouter.TOKEN_KEYWORD
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.ADD_COMMENT
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.ADD_NEW_CHAT
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.ADD_NEW_POST
@@ -9,23 +9,24 @@ import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.Com
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.GET_ALL_COMMENTS
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.GET_ALL_REPLIES_ON_COMMENT
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.GET_INBOX_MESSAGES
+import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.REACT_TO_POST
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.UPDATE_COMMENT
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.allposts.AllCommunityPostsParent
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.addcomment.AddCommentData
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.addcomment.AddCommentResponse
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.allcomments.AllCommentsRequestBody
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.allcomments.AllCommentsResponse
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.repliesoncomment.AllRepliesResponse
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.repliesoncomment.GetAllRepliesData
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.updatecomment.UpdateCommentData
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.comments.updatecomment.UpdatedCommentResponse
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.newpost.AddNewCommunityPost
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.communityscreen.newpost.NewPostResponse
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.AllChats
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.NewChat
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.addnewchat.AddNewChatModel
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allcurmessages.AllCurrMessages
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allinboxmessages.InboxMsgModel
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.all_comm_posts_dto.AllCommunityPostsDto
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.comments_dto.add_dto.AddCommentData
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.comments_dto.add_dto.AddCommentResponse
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.comments_dto.all_comments_dto.AllCommentsRequestBody
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.comments_dto.all_comments_dto.AllCommentsResponseDto
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.comments_dto.replies_dto.AllRepliesResponse
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.comments_dto.replies_dto.GetAllRepliesData
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.comments_dto.update_dto.UpdateCommentData
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.comments_dto.update_dto.UpdatedCommentResponse
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.messages_dto.add_new_chat_dto.AddNewChatResponseDto
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.messages_dto.get_all_chats_dto.GetAllChatsResponseDto
+import com.alpharays.mymedicommfma.communityv2.community_app.data.dto.messages_dto.get_inbox_list_dto.GetInboxListResponseDto
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.community_screen.newpost.AddNewCommunityPost
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.community_screen.newpost.NewPostResponse
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.community_screen.reactions.PostReactionResponse
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.community_screen.reactions.ReactionBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -38,46 +39,53 @@ interface CommunityApiServices {
      * community screen endpoints
      */
 
-    // all docs posts
+    // all community posts
     @GET(ALL_COMMUNITY_POSTS)
     suspend fun getAllCommunityPosts(
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
-    ): Response<AllCommunityPostsParent>
+        @Header(TOKEN_KEYWORD) token: String,
+    ): Response<AllCommunityPostsDto>
 
     // all new post
     @POST(ADD_NEW_POST)
     suspend fun addMyNewPost(
         @Body addNewCommunityPost: AddNewCommunityPost,
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
+        @Header(TOKEN_KEYWORD) token: String,
     ): Response<NewPostResponse>
 
     // all comments
     @PUT(GET_ALL_COMMENTS)
     suspend fun getAllComments(
         @Body postIdBody: AllCommentsRequestBody,
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
-    ): Response<AllCommentsResponse>
+        @Header(TOKEN_KEYWORD) token: String,
+    ): Response<AllCommentsResponseDto>
 
     // all replies on a comment
-    @GET(GET_ALL_REPLIES_ON_COMMENT)
+    @POST(GET_ALL_REPLIES_ON_COMMENT)
     suspend fun getAllReplies(
+        @Header(TOKEN_KEYWORD) token: String,
         @Body commentId: GetAllRepliesData,
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
     ): Response<AllRepliesResponse>
 
     // add new comment
     @POST(ADD_COMMENT)
     suspend fun addNewComment(
         @Body addCommentData: AddCommentData,
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
+        @Header(TOKEN_KEYWORD) token: String,
     ): Response<AddCommentResponse>
 
     // reply on a comment
     @PUT(UPDATE_COMMENT)
     suspend fun updateComment(
         @Body reply: UpdateCommentData,
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
+        @Header(TOKEN_KEYWORD) token: String,
     ): Response<UpdatedCommentResponse>
+
+    // react to a post
+    @POST(REACT_TO_POST)
+    suspend fun updatePostReaction(
+        @Header(TOKEN_KEYWORD) token: String,
+        @Body reactionBody : ReactionBody,
+    ) : Response<PostReactionResponse>
 
 
     /**
@@ -87,20 +95,20 @@ interface CommunityApiServices {
     // add new chat
     @POST(ADD_NEW_CHAT)
     suspend fun startNewChat(
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
-        @Body newChat: NewChat,
-    ): Response<AddNewChatModel>
+        @Header(TOKEN_KEYWORD) token: String,
+        @Header("sid") receiverId: String,
+    ): Response<AddNewChatResponseDto>
 
     // get all inbox messages
     @GET(GET_INBOX_MESSAGES)
     suspend fun getAllInboxMessagesList(
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
-    ): Response<InboxMsgModel>
+        @Header(TOKEN_KEYWORD) token: String,
+    ): Response<GetInboxListResponseDto>
 
     // get all chats
     @GET(GET_ALL_CHATS)
     suspend fun getAllMessagesList(
-        @Header(MedCommRouter.TOKEN_KEYWORD) token: String,
-        @Body allChats: AllChats,
-    ): Response<AllCurrMessages>
+        @Header(TOKEN_KEYWORD) token: String,
+        @Header("chat_id") chatId: String,
+    ): Response<GetAllChatsResponseDto>
 }

@@ -8,10 +8,10 @@ import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.Com
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.MESSAGES_ROOM
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.MESSAGE_REPLY_EVENT
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityConstants.SEND_MESSAGE
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.messages_screen.get_all_chats.MessageResponse
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.socketio.MessagesSocketState
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.socketio.SocketMessages
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.SocketIO
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.DirectMessage
 import com.google.gson.Gson
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -202,7 +202,7 @@ class SocketIOImpl : SocketIO {
         messagesSocket?.disconnect()
     }
 
-    override fun emitDirectMessage(newMessageMap: Map<String, DirectMessage>) {
+    override fun emitDirectMessage(newMessageMap: Map<String, MessageResponse>) {
         messagesSocket?.emit(SEND_MESSAGE, newMessageMap)
     }
 

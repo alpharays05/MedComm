@@ -37,27 +37,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.alpharays.mymedicommfma.R
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.messages_screen.get_inbox_list.InboxResponse
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.common.global_search.GlobalSearchBox
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.allinboxmessages.ChatMsg
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.manRopeFontFamily
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.size
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.spacing
-import java.util.Calendar
 
 @Composable
-fun MessageInboxScreen(navController: NavController) {
+fun MessageInboxScreen(
+    navController: NavController,
+    viewModel: MessagesViewModel = hiltViewModel(),
+) {
+    val response by viewModel.getInboxListStateFlow.collectAsStateWithLifecycle()
+    val allMessagesList = response.data?.allMessages ?: emptyList()
     var searchList by remember {
-        mutableStateOf<Array<ChatMsg>?>(null)
+        mutableStateOf<Array<InboxResponse>?>(null)
     }
     var newSearchedList by remember {
-        mutableStateOf<Array<ChatMsg>?>(null)
+        mutableStateOf<Array<InboxResponse>?>(null)
     }
     var originalList by remember {
-        mutableStateOf<Array<ChatMsg>?>(null)
+        mutableStateOf<Array<InboxResponse>?>(null)
     }
 
     Surface(
@@ -84,7 +90,7 @@ fun MessageInboxScreen(navController: NavController) {
 
             ComposableMessageInboxList(
                 navController = navController,
-                newSearchedList = newSearchedList,
+                allMessagesList = allMessagesList,
                 onInboxListReceived = {
                     searchList = it
                     originalList = it
@@ -97,9 +103,9 @@ fun MessageInboxScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposableMessageInboxSearch(
-    searchList: Array<ChatMsg>?,
+    searchList: Array<InboxResponse>?,
     onReset: () -> Unit,
-    onNewSearchedList: (Array<ChatMsg>) -> Unit,
+    onNewSearchedList: (Array<InboxResponse>) -> Unit,
     navController: NavController,
 ) {
     var messageSearchText by remember {
@@ -110,15 +116,15 @@ fun ComposableMessageInboxSearch(
     }
 
     val messageSearchItems = remember {
-        mutableStateListOf<ChatMsg>()
+        mutableStateListOf<InboxResponse>()
     }
 
     val messageSearchHistoryItems = remember {
-        mutableStateListOf<ChatMsg>()
+        mutableStateListOf<InboxResponse>()
     }
 
-    var searchedChatMsg by remember {
-        mutableStateOf<ChatMsg?>(null)
+    var searchedInboxResponse by remember {
+        mutableStateOf<InboxResponse?>(null)
     }
 
     GlobalSearchBox(navController)
@@ -127,86 +133,20 @@ fun ComposableMessageInboxSearch(
 @Composable
 fun ComposableMessageInboxList(
     navController: NavController,
-    newSearchedList: Array<ChatMsg>? = emptyArray(),
-    onInboxListReceived: (Array<ChatMsg>) -> Unit,
+    allMessagesList: List<InboxResponse?>,
+    onInboxListReceived: (Array<InboxResponse>) -> Unit,
 ) {
-    val inboxList: ArrayList<ChatMsg> = ArrayList()
-    val time = Calendar.getInstance().time
-    val chat1 =
-        ChatMsg(
-            "01",
-            "",
-            "Hello how are you?",
-            time.toString(),
-            "1"
-        )
-    val chat2 =
-        ChatMsg(
-            "02",
-            "",
-            "My name is Shivang",
-            time.toString(),
-            "2"
-        )
-    val chat3 =
-        ChatMsg(
-            "04",
-            "",
-            "What's with this behavior?",
-            time.toString(),
-            "3"
-        )
-    val chat4 =
-        ChatMsg(
-            "05",
-            "",
-            "You must pass this exam",
-            time.toString(),
-            "4"
-        )
-    val chat5 =
-        ChatMsg(
-            "06",
-            "",
-            "Certain people say how are you?",
-            time.toString(),
-            "5"
-        )
-    val chat6 =
-        ChatMsg(
-            "07",
-            "",
-            "But I tried and couldn't resolve it?",
-            time.toString(),
-            "6"
-        )
-
-    inboxList.add(chat1)
-    inboxList.add(chat2)
-    inboxList.add(chat3)
-    inboxList.add(chat4)
-    inboxList.add(chat5)
-    inboxList.add(chat6)
-
-    var list = inboxList.toTypedArray()
-
-    onInboxListReceived(list)
-
-    if (!newSearchedList.isNullOrEmpty()) {
-        list = newSearchedList
-    }
-
     LazyColumn(
         modifier = Modifier.padding(MaterialTheme.spacing.extraSmall)
     ) {
-        items(list) {
-            ComposableMessageBoxCard(it, navController)
+        items(allMessagesList) { inboxResponse ->
+            ComposableMessageBoxCard(inboxResponse, navController)
         }
     }
 }
 
 @Composable
-fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
+fun ComposableMessageBoxCard(chatMsg: InboxResponse?, navController: NavController) {
     val style1 = TextStyle(
         fontWeight = FontWeight.W700,
         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
@@ -225,7 +165,10 @@ fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
             .border(0.5.dp, Color.White, RoundedCornerShape(MaterialTheme.spacing.extraSmall))
             .padding(MaterialTheme.spacing.extraSmall)
             .clickable {
-                navController.navigate(CommunityAppScreens.DirectMessageScreen.route)
+                val userImage =
+                    chatMsg?.userImage?.ifEmpty { "userImage" }
+                        ?: "userImage" // TODO: should never be empty or null : confirm with Raman
+                navController.navigate(CommunityAppScreens.DirectMessageScreen.route + "/${chatMsg?.chatId}" + "/${chatMsg?.userName}" + "/${userImage}")
             },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f)
@@ -238,13 +181,17 @@ fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
             modifier = Modifier.padding(5.dp)
         ) {
             val context = LocalContext.current
-            val painter = painterResource(id = R.drawable.doctor_profile)
+            val painter = painterResource(id = R.drawable.doctor_profile_ph)
             val color = CommunityUtils.getMedicoColor(context, R.color.bluish_gray)
             Image(
                 modifier = Modifier
                     .padding(top = 8.dp)
                     .size(MaterialTheme.size.large)
-                    .border(1.dp, Color(color), RoundedCornerShape(MaterialTheme.size.defaultIconSize))
+                    .border(
+                        1.dp,
+                        Color(color),
+                        RoundedCornerShape(MaterialTheme.size.defaultIconSize)
+                    )
                     .clip(RoundedCornerShape(MaterialTheme.size.defaultIconSize)),
                 painter = painter,
                 contentDescription = "User avatar"
@@ -253,11 +200,11 @@ fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
                 modifier = Modifier.padding(start = 10.dp, top = 5.dp)
             ) {
                 Text(
-                    text = "Dr Shivang Gautam",
+                    text = chatMsg?.userName ?: "--",
                     style = style1
                 )
                 Text(
-                    text = chatMsg.lastMessage ?: "NA",
+                    text = chatMsg?.lastMessage?.ifEmpty { "No message available" } ?: "--",
                     style = style1.copy(
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                         fontWeight = FontWeight.W500
@@ -269,7 +216,7 @@ fun ComposableMessageBoxCard(chatMsg: ChatMsg, navController: NavController) {
                         .padding(MaterialTheme.spacing.extraSmall),
                     color = Color.Gray,
                     style = style2.copy(textAlign = TextAlign.End),
-                    text = chatMsg.lastMsgTimeStamp ?: "NA"
+                    text = chatMsg?.lastMsgTimeStamp ?: "--"
                 )
             }
         }

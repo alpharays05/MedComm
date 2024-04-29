@@ -9,14 +9,14 @@ import com.alpharays.mymedicommfma.communityv2.MedCommRouter.API_SAFE_KEY_VALUE
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.BASE_URL
 import com.alpharays.mymedicommfma.communityv2.MedCommRouter.SHARED_PREFERENCE_NAME
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.remote.CommunityApiServices
-import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.CommunityRepositoryImpl
+import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.CommunityApiImpl
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.DatastoreRepositoryImpl
+import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.MessagesRepositoryImpl
 import com.alpharays.mymedicommfma.communityv2.community_app.data.source.repo_impl.SocketIOImpl
-import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.CommunityRepository
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.CommunityApi
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.DatastoreRepository
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.MessagesRepository
 import com.alpharays.mymedicommfma.communityv2.community_app.domain.repository.SocketIO
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.repository.MessagesRepository
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.repository.MessagesRepositoryImpl
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -74,8 +74,8 @@ object AppModule {
     fun provideCommunityRepository(
         apiServices: CommunityApiServices,
         responseHandler: ResponseHandler,
-    ): CommunityRepository {
-        return CommunityRepositoryImpl(apiServices, responseHandler)
+    ): CommunityApi {
+        return CommunityApiImpl(apiServices, responseHandler)
     }
 
     @Provides

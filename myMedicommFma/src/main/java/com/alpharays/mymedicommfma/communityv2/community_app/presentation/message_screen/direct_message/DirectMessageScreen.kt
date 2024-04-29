@@ -30,10 +30,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -64,19 +64,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.alpharays.mymedicommfma.R
+import com.alpharays.mymedicommfma.communityv2.MedCommToast
 import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
-import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.to_do_components.messages.model.DirectMessage
+import com.alpharays.mymedicommfma.communityv2.community_app.domain.model.messages_screen.get_all_chats.MessageResponse
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.BluishGray
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.theme.manRopeFontFamily
@@ -86,25 +86,40 @@ import kotlinx.coroutines.launch
 @Composable
 fun DirectMessageScreen(
     navController: NavController,
-    directMessageViewModel: DirectMessageViewModel = hiltViewModel(),
+    chatId: String,
+    chatUserName: String,
+    chatUserImage: String,
+    viewModel: DirectMessageViewModel = hiltViewModel(),
 ) {
+    val response by viewModel.getAllChatsStateFlow.collectAsStateWithLifecycle()
+    val allMessages = (response.data?.chatsData ?: emptyList()).getOrNull(0)?.messages ?: emptyList() // TODO: FOR NOW : AS SAID BY RAMAN
+    val currentUserCheckId = response.data?.senderCheckId
+    LaunchedEffect(chatId) {
+        if(chatId.isNotEmpty()){
+            viewModel.getAllMessages(chatId)
+        }
+    }
     Surface(modifier = Modifier.fillMaxSize()) {
-        ComposableDirectMessageScreen(navController, directMessageViewModel)
+        ComposableDirectMessageScreen(navController, chatUserName, chatUserImage, allMessages, currentUserCheckId, viewModel)
     }
 }
 
 @Composable
 fun ComposableDirectMessageScreen(
     navController: NavController,
-    directMessageViewModel: DirectMessageViewModel,
+    chatUserName: String,
+    chatUserImage: String,
+    allMessages: List<MessageResponse?>,
+    currentUserCheckId: String?,
+    viewModel: DirectMessageViewModel
 ) {
     Scaffold(
         modifier = Modifier.navigationBarsPadding(),
         topBar = {
-            ComposableUserTopBar(navController)
+            ComposableUserTopBar(navController, chatUserName, chatUserImage)
         },
         bottomBar = {
-            ComposableUserBottomBar(navController, directMessageViewModel)
+            ComposableUserBottomBar(navController, viewModel)
         },
         containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 1f)
     ) { paddingValues ->
@@ -120,21 +135,21 @@ fun ComposableDirectMessageScreen(
                     .height(1.dp)
                     .border(1.dp, Color(0xFF6F6F6F), RoundedCornerShape(2.dp))
             )
-            ComposableUserMessages(Modifier, navController)
+            ComposableUserMessages(navController, currentUserCheckId, allMessages)
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ComposableUserTopBar(navController: NavController) {
+fun ComposableUserTopBar(navController: NavController, chatUserName: String, chatUserImage: String) {
     val style = TextStyle(
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
         fontFamily = manRopeFontFamily,
         fontWeight = FontWeight.W500,
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
     )
-    val painter = painterResource(id = R.drawable.doctor_profile)
+    val painter = painterResource(id = R.drawable.doctor_profile_ph)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -145,8 +160,8 @@ fun ComposableUserTopBar(navController: NavController) {
             modifier = Modifier
                 .clickable {
                     navController.navigate(CommunityAppScreens.MessageInboxScreen.route) {
-//                        popUpTo(0) // TODO: 0 ? honto dis ka ? (for real?)
-                        navController.popBackStack()
+                        popUpTo(0) // TODO: 0 ? honto dis ka ? (for real?)
+//                        navController.popBackStack()
                     }
                 }
                 .padding(end = MaterialTheme.spacing.small),
@@ -169,7 +184,7 @@ fun ComposableUserTopBar(navController: NavController) {
                 .padding(start = 15.dp)
                 .weight(1f)
                 .basicMarquee(Int.MAX_VALUE),
-            text = "Dr. Shivang",
+            text = chatUserName,
             maxLines = 1,
             style = style
         )
@@ -198,76 +213,11 @@ fun ComposableUserTopBar(navController: NavController) {
 }
 
 @Composable
-fun ComposableUserMessages(modifier: Modifier, navController: NavController) {
-    val messageList = ArrayList<DirectMessage>()
-    val msg = "oifjsdofihsdfjkljkkkkkkkkkkkkkkkkkkkkkksflksdfjdlksfj"
-    val msg1 = DirectMessage(
-        "my name is zoravar",
-        "0",
-        "9958820784",
-        "9312481321"
-    )
-    val msg2 = DirectMessage(
-        "okay, cool",
-        "1",
-        "9958820784",
-        "9312481321"
-    )
-    val msg3 = DirectMessage(
-        "where do u live?",
-        "0",
-        "9958820784",
-        "9312481321"
-    )
-    val msg4 = DirectMessage(
-        "maybe in new jersey",
-        "1",
-        "9958820784",
-        "9312481321"
-    )
-    val msg5 = DirectMessage(
-        "what do you mean by 'maybe'?",
-        "0",
-        "9958820784",
-        "9312481321"
-    )
-    val msg6 = DirectMessage(
-        msg,
-        "0",
-        "9958820784",
-        "9312481321"
-    )
-    val msg7 = DirectMessage(
-        "abe chl",
-        "1",
-        "9958820784",
-        "9312481321"
-    )
-
-
-//    val msg8 = DirectMessage("my name is zoravar", 0, "9958820784", "9312481321")
-//    val msg9 = DirectMessage("okay, cool", 1, "9958820784", "9312481321")
-//    val msg10 = DirectMessage("where do u live?", 0, "9958820784", "9312481321")
-//    val msg11 = DirectMessage("maybe in new jersey", 1, "9958820784", "9312481321")
-//    val msg12 = DirectMessage("what do you mean by 'maybe'?", 0, "9958820784", "9312481321")
-//    val msg13 = DirectMessage(msg, 0, "9958820784", "9312481321")
-//    val msg14 = DirectMessage("abe chl", 1, "9958820784", "9312481321")
-
-    messageList.add(msg1)
-    messageList.add(msg2)
-    messageList.add(msg3)
-    messageList.add(msg4)
-    messageList.add(msg5)
-    messageList.add(msg6)
-    messageList.add(msg7)
-//    messageList.add(msg8)
-//    messageList.add(msg9)
-//    messageList.add(msg10)
-//    messageList.add(msg11)
-//    messageList.add(msg12)
-//    messageList.add(msg13)
-//    messageList.add(msg14)
-
+fun ComposableUserMessages(
+    navController: NavController,
+    currentUserCheckId: String?,
+    allMessages: List<MessageResponse?>
+) {
     val messageState = rememberLazyListState()
     val messageScope = rememberCoroutineScope()
 
@@ -284,25 +234,25 @@ fun ComposableUserMessages(modifier: Modifier, navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             state = messageState
         ) {
-            items(messageList) { message ->
-                if (message.senderId == "0") {
-                    ComposableSenderCard(modifier, message)
+            items(allMessages) { chatsResponse ->
+                if (currentUserCheckId == chatsResponse?.senderId) {
+                    ComposableSenderCard(Modifier, chatsResponse)
                 } else {
-                    ComposableReceiverCard(modifier, message)
+                    ComposableReceiverCard(Modifier, chatsResponse)
                 }
             }
         }
 
-        LaunchedEffect(key1 = messageList.size) {
+        LaunchedEffect(key1 = allMessages.size) {
             messageScope.launch {
-                messageState.animateScrollToItem(messageList.size)
+                messageState.animateScrollToItem(allMessages.size)
             }
         }
     }
 }
 
 @Composable
-fun ComposableSenderCard(modifier: Modifier, message: DirectMessage) {
+fun ComposableSenderCard(modifier: Modifier, message: MessageResponse?) {
     Box(
         modifier
             .padding(start = 30.dp)
@@ -316,8 +266,9 @@ fun ComposableSenderCard(modifier: Modifier, message: DirectMessage) {
         ) {
             Column(modifier.padding(10.dp)) {
                 Text(
-                    text = message.message ?: "",
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
+                    text = message?.messageContent ?: "",
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+                    fontSize = 14.sp
                 )
             }
         }
@@ -325,7 +276,7 @@ fun ComposableSenderCard(modifier: Modifier, message: DirectMessage) {
 }
 
 @Composable
-fun ComposableReceiverCard(modifier: Modifier, message: DirectMessage) {
+fun ComposableReceiverCard(modifier: Modifier, message: MessageResponse?) {
     Box(modifier.fillMaxSize()) {
         Card(
             modifier.padding(10.dp),
@@ -334,8 +285,9 @@ fun ComposableReceiverCard(modifier: Modifier, message: DirectMessage) {
         ) {
             Column(modifier.padding(10.dp)) {
                 Text(
-                    text = message.message ?: "",
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
+                    text = message?.messageContent ?: "",
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f),
+                    fontSize = 14.sp
                 )
             }
         }
@@ -345,25 +297,20 @@ fun ComposableReceiverCard(modifier: Modifier, message: DirectMessage) {
 @Composable
 fun ComposableUserBottomBar(
     navController: NavController,
-    directMessageViewModel: DirectMessageViewModel,
+    viewModel: DirectMessageViewModel,
 ) {
-    var messageText by remember {
-        mutableStateOf("")
-    }
-    var sendMessageIconVisible by remember {
-        mutableStateOf(messageText != "")
-    }
+    var messageText by remember { mutableStateOf("") }
+    var sendMessageIconVisible = messageText.isNotEmpty()
     val rowHeight = LocalConfiguration.current.screenHeightDp.dp
     val maxHeight = LocalDensity.current.run { (0.5f * rowHeight.value).toDp() }
-    var isAttachmentsVisible by remember {
-        mutableStateOf(false)
-    }
+    var isAttachmentsVisible by remember { mutableStateOf(false) }
     val animationTime = 300
     val keyString = "cur_message_details"
 
     val messageData = remember {
-        mutableStateMapOf<String, DirectMessage>()
+        mutableStateMapOf<String, MessageResponse>()
     }
+    val context = LocalContext.current
 
     Column {
         AnimatedVisibility(
@@ -399,7 +346,6 @@ fun ComposableUserBottomBar(
                     .imePadding()
                     .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
                     .padding(15.dp)
-
                     .clickable {
                         isAttachmentsVisible = false
                     },
@@ -409,7 +355,7 @@ fun ComposableUserBottomBar(
                     messageText = newText
                 },
                 textStyle = TextStyle(
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     color = Color(0xFF330091)
                 ),
                 decorationBox = { innerTextField ->
@@ -442,16 +388,15 @@ fun ComposableUserBottomBar(
                 }
             )
 
-            if (sendMessageIconVisible) {
+            AnimatedVisibility(visible = sendMessageIconVisible) {
                 Icon(
                     modifier = Modifier
                         .size(50.dp)
                         .padding(start = 15.dp, end = 5.dp)
                         .clickable {
-                            messageData[keyString] = DirectMessage(messageText, "1", "2", "3")
-                            directMessageViewModel.sendMessage(messageData)
+                            MedCommToast.showToast(context, "Coming Soon...")
                         },
-                    imageVector = Icons.Default.Send,
+                    imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send message"
                 )
             }
@@ -521,11 +466,4 @@ fun ComposableLottieComposition(
             )
         )
     }
-}
-
-@Preview
-@Composable
-fun DirectMessageScreenPreview() {
-//    DirectMessageScreen(rememberNavController())
-    ComposableUserTopBar(rememberNavController())
 }

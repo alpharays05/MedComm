@@ -13,8 +13,8 @@ android {
     compileSdk = 34
 
     defaultConfig {
-//        applicationId = "com.alphrays.medicommfma"
         minSdk = 26
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }

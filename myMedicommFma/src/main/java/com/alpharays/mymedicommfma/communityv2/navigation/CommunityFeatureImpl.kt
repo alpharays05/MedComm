@@ -1,5 +1,6 @@
 package com.alpharays.mymedicommfma.communityv2.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -14,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.alpharays.mymedicommfma.communityv2.CommunityFeatureApi
-import com.alpharays.mymedicommfma.communityv2.community_app.community_utils.CommunityUtils
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.common.global_search.GlobalCommunitySearch
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.all_posts_screen.CommunityScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.community_screen.full_post_screen.CommunityFullPostScreen
@@ -24,11 +24,12 @@ import com.alpharays.mymedicommfma.communityv2.community_app.presentation.commun
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.message_screen.direct_message.DirectMessageScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.message_screen.message_inbox.MessageInboxScreen
 import com.alpharays.mymedicommfma.communityv2.community_app.presentation.navigation.CommunityAppScreens
+import javax.inject.Inject
 
 private const val baseRoute = "community_screen"
 private const val commRouteScenario = "$baseRoute/scenario"
 
-class CommunityFeatureImpl : CommunityFeatureApi {
+class CommunityFeatureImpl @Inject constructor(context: Context): CommunityFeatureApi {
     override val communityRoute: String
         get() = baseRoute
 
@@ -65,10 +66,10 @@ class CommunityFeatureImpl : CommunityFeatureApi {
                 )
             ) { entry ->
                 val context = LocalContext.current
-                val postId = entry.arguments?.getString("currentPostId") ?: ""
-                val addComment = entry.arguments?.getBoolean("addComment") ?: false
-                CommunityUtils.setOneTimePostId(context, postId)
-                CommunityFullPostScreen(navController = navController, addComment = addComment)
+//                val postId = entry.arguments?.getString("currentPostId") ?: ""
+//                val addComment = entry.arguments?.getBoolean("addComment") ?: false
+//                CommunityUtils.setOneTimePostId(context, postId)
+                CommunityFullPostScreen(navController = navController)
             }
 
             composable(route = CommunityAppScreens.CommunityRepostScreen.route) {

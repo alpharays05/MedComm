@@ -54,7 +54,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 fun setupMedComm(context: Context) {
 //    CommunityUtils.setAuthToken(context, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mjc3N2Q4MjVmZmMyNTA3MmE5NDBiNyIsImlhdCI6MTcwOTU1NzA4NH0.C0lTg0jf6gtUfBFGX7DAMJQ8kVKK0FboDC547pkC4Is")
-    CommunityUtils.setAuthToken(context, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODFkNDE4ZWE0Mjk4ODI5ZGExOTdiYiIsImlhdCI6MTcxMjY0NDQ0Mn0.bOeYRf1viECg8-5PpeJmj1U0Nz45Z4zHBQSyrD8rQh4")
+//    CommunityUtils.setAuthToken(context, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODFkNDE4ZWE0Mjk4ODI5ZGExOTdiYiIsImlhdCI6MTcxMjY0NDQ0Mn0.bOeYRf1viECg8-5PpeJmj1U0Nz45Z4zHBQSyrD8rQh4")
+    CommunityUtils.setAuthToken(context, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Mjc3N2Q4MjVmZmMyNTA3MmE5NDBiNyIsImlhdCI6MTcwNzAzNzI1M30.fWg4f62zESLpe7CmcCyE_GBGcp9odTJbe8j86LqNR-A")
 }
 
 fun openMediCommFma(context: Context) {

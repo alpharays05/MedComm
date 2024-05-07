@@ -48,4 +48,8 @@ object CommunityConstants {
     const val COMMENT_PAINTER_CONTENT_DSC = "Comment Image"
     const val REPOST_PAINTER_CONTENT_DSC = "Repost Image"
     const val SEND_PAINTER_CONTENT_DSC = "Send Image"
+
+    const val TOKEN = "token"
+    const val POST_ID = "post_id"
+    const val COMM_TAG_VM = "COMM_TAG_VM"
 }

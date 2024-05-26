@@ -24,15 +24,6 @@ object CommunityConstants {
     const val COMMUNITY_REPOST_SCREEN_ROUTE = "community_repost_screen_route"
     const val COMMENTS_REPLY_FULL_SCREEN_ROUTE = "comments_reply_full_screen_route"
 
-    // TODO : community app not linked to room db -> only initialized
-    const val MEDICO_COMMUNITY_TABLE = "medico_community_table"
-
-    const val LIKE_POST_CD = "Like Post"
-    const val LOVE_POST_CD = "Love Post"
-    const val CELEBRATE_POST_CD = "Celebrate Post"
-    const val SUPPORT_POST_CD = "ReactionType Post"
-    const val INSIGHTFUL_POST_CD = "Insightful Post"
-    const val FUNNY_POST_CD = "Funny Post"
     const val CAN_NOT_REACT_NO_CONNECTION = "Can not react, No connection"
     const val CAN_NOT_COMMENT_NO_CONNECTION = "Can not comment, No connection"
     const val CAN_NOT_REPOST_NO_CONNECTION = "Can not comment, No connection"

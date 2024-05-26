@@ -150,16 +150,6 @@ class CommunityUtils {
             }
         }
 
-//        private lateinit var connectivityObserver: ConnectivityObserver
-//        @Composable
-//        fun isInternetAvailable(context: Context): ConnectivityObserver.Status {
-//            connectivityObserver = NetworkConnectivityObserver(context)
-//            val status by connectivityObserver.observe().collectAsState(
-//                initial = ConnectivityObserver.Status.Unavailable
-//            )
-//            return status
-//        }
-
         fun getMedicoColor(context: Context, color: Int): Int {
             return context.getColor(color)
         }

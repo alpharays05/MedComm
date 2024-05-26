@@ -221,7 +221,6 @@ fun ComposableCommunityPosts(
 ) {
     val context = LocalContext.current
     val cardBorderBrush = Brush.sweepGradient(colors = listOf(BluishGray, Color.Transparent, BluishGray, Color.Transparent))
-//    val cardBorderBrush = Brush.linearGradient(colors = listOf(BluishGray, Color.Transparent, Color.Transparent, BluishGray))
 
     Box(
         modifier = Modifier

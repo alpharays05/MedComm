@@ -37,10 +37,13 @@ class CommunityFeatureImpl : CommunityFeatureApi {
         navController: NavHostController,
         modifier: Modifier
     ) {
-        // TODO: Replace your existing NavHost with AnimatedNavHost. You'll need to define the animations for each navigation action.
+        //base screen for the community feature
         navGraphBuilder.composable(baseRoute) {
             CommunityScreen(navController = navController)
         }
+
+
+        //define the navigation graph for the community feature
         navGraphBuilder.navigation(
             route = commRouteScenario,
             startDestination = CommunityAppScreens.AddNewCommunityPostScreen.route
@@ -85,10 +88,14 @@ class CommunityFeatureImpl : CommunityFeatureApi {
                         type = NavType.StringType
                     }
                 )
-            ){ entry ->
+            ) { entry ->
                 val postId = entry.arguments?.getString("currentPostId") ?: ""
                 val commentId = entry.arguments?.getString("commentId") ?: ""
-                CommentReplyFullScreen(navController = navController, postId = postId, commentId = commentId)
+                CommentReplyFullScreen(
+                    navController = navController,
+                    postId = postId,
+                    commentId = commentId
+                )
             }
 
             // message screen(s)
@@ -109,7 +116,7 @@ class CommunityFeatureImpl : CommunityFeatureApi {
                         type = NavType.StringType
                     }
                 )
-            ){ entry ->
+            ) { entry ->
                 val chatId = entry.arguments?.getString("chatId") ?: ""
                 val chatUserName = entry.arguments?.getString("chatUserName") ?: ""
                 val chatUserImage = entry.arguments?.getString("chatUserImage") ?: ""
@@ -124,11 +131,3 @@ class CommunityFeatureImpl : CommunityFeatureApi {
     }
 }
 
-@Composable
-inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavHostController): T {
-    val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
-    val parentEntry = remember(this) {
-        navController.getBackStackEntry(navGraphRoute)
-    }
-    return hiltViewModel(parentEntry)
-}
